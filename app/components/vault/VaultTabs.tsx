@@ -16,9 +16,12 @@ interface VaultTabsProps {
     amount: number;
     currentPrice: number;
   };
+  selectedToken: { symbol: string; mint: string }; // 新增
+  setSelectedToken: (token: { symbol: string; mint: string }) => void; // 新增
+  supportedTokens: { symbol: string; mint: string }[];
 }
 
-export default function VaultTabs({ stakeData, unstakeData }: VaultTabsProps) {
+export default function VaultTabs({ stakeData, unstakeData, selectedToken, setSelectedToken, supportedTokens }: VaultTabsProps) {
   return (
     <div className="bg-yellow-100 dark:bg-[#1A1F2E] rounded-3xl border-4 border-blue-400 p-6">
       <div className="text-2xl font-bold mb-6 text-center">
@@ -42,11 +45,21 @@ export default function VaultTabs({ stakeData, unstakeData }: VaultTabsProps) {
         </TabsList>
 
         <TabsContent value="stake" className="mt-0">
-          <StakeCard {...stakeData} />
+          <StakeCard 
+            {...stakeData} 
+            selectedToken={selectedToken} 
+            setSelectedToken={setSelectedToken} 
+            supportedTokens={supportedTokens}
+          />
         </TabsContent>
 
         <TabsContent value="unstake" className="mt-0">
-          <UnstakeCard {...unstakeData} />
+          <UnstakeCard
+            {...unstakeData}
+            selectedToken={selectedToken} 
+            setSelectedToken={setSelectedToken} 
+            supportedTokens={supportedTokens}
+          />
         </TabsContent>
       </Tabs>
     </div>

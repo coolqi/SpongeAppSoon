@@ -86,7 +86,7 @@ export default function Navbar() {
       <div className="fixed left-0 w-64 bottom-0 p-6">
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            © 2024 Sponge
+            © 2025 Sponge
           </p>
           <a
             href="https://x.com/spongedotsol"

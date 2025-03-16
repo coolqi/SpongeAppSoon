@@ -40,7 +40,7 @@ const WalletContextProvider: React.FC<{ children: ReactNode }> = (props: {
     >
       <div className="w-full flex justify-end p-6 space-x-4">
         <div className="flex items-center gap-2">
-          <NetworkSwitcher />
+          {/* <NetworkSwitcher /> */}
           <UnifiedWalletButton />
         </div>
       </div>

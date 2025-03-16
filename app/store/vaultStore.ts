@@ -17,16 +17,16 @@ export const useVaultStore = create<VaultState>((set) => ({
   activeTab: 'stake',
   tokens: [
     {
+      symbol: 'ETH',
+      available: 0.87780624,
+      value: 0,
+      icon: 'Ξ',
+    },
+    {
       symbol: 'SOL',
       available: 0.097846,
       value: 0.00,
       icon: '◎',
-    },
-    {
-      symbol: 'tSOL',
-      available: 0.87780624,
-      value: 0,
-      icon: '⬥',
     },
   ],
   setActiveTab: (tab) => set({ activeTab: tab }),

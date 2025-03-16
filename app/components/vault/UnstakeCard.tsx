@@ -8,40 +8,67 @@ import {
   useAnchorWallet,
   AnchorWallet,
 } from "@solana/wallet-adapter-react";
-import { useState } from "react"
-import { unstake } from "@/lib/program";
+import { useState, useEffect } from "react"
+import { unstake, getUserNativeStaked, getUserSplBalance } from "@/lib/program";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
-import useSnackbarStore from "@/store/useSnackbarStore";
-import useLoadingStore from "@/store/useLoadingStore";
+
 interface UnstakeCardProps {
   tokenSymbol: string;
-  amount: number;
   currentPrice: number;
+  selectedToken: { symbol: string; mint: string };
+  setSelectedToken: (token: { symbol: string; mint: string }) => void;
+  supportedTokens: { symbol: string; mint: string }[];
 }
 
-export default function UnstakeCard({ 
-  tokenSymbol, 
-  amount, 
-  currentPrice,
-}: UnstakeCardProps) {
+export default function UnstakeCard({ tokenSymbol, currentPrice, selectedToken, setSelectedToken, supportedTokens }: UnstakeCardProps) {
   const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
   const wallet = useAnchorWallet();
   const [unstakeAmount, setUnstakeAmount] = useState(0);
   const [unstakeValue, setUnstakeValue] = useState(0);
+  const [staked, setStaked] = useState<number | null>(null);
+  const connection = new Connection(currentNetwork.rpcUrl, "confirmed");
+
+  useEffect(() => {
+      if (!wallet) return;
+  
+      const connection = new Connection(currentNetwork.rpcUrl, "confirmed");
+  
+      if (selectedToken.symbol === "ETH") {
+        getUserNativeStaked(
+          connection,
+          wallet as AnchorWallet,
+          currentNetwork.idl,
+          currentNetwork.contractAddress,
+          new PublicKey(currentNetwork.authorityPublicKey)
+        )
+        .then(setStaked);
+      } else {
+        getUserSplBalance(connection, wallet, selectedToken.mint)
+        .then(setStaked);
+      }
+    }, [wallet, currentNetwork, selectedToken]);
+
   return (
     <div className="bg-white dark:bg-[#0A0F1C] rounded-2xl p-6 border-4 border-red-400">
-      <TokenData 
+      <TokenData
         symbol={tokenSymbol}
         amount={unstakeAmount}
         setAmount={setUnstakeAmount}
         value={unstakeValue}
         setValue={setUnstakeValue}
         currentPrice={currentPrice}
+        balance={staked}
+        selectedToken={selectedToken}
+        setSelectedToken={setSelectedToken}
+        supportedTokens={supportedTokens}
       />
       
-      <StakePercentageButtons />
+      <StakePercentageButtons 
+        balance={staked} 
+        setStakeAmount={setUnstakeAmount} 
+      />
       
       <div className="mt-6 space-y-3">
         <div className="flex justify-between items-center">
@@ -53,15 +80,9 @@ export default function UnstakeCard({
       <MemeButton
         className="w-full mt-6 bg-red-400 hover:bg-red-300 border-red-600"
         onClick={async () => {
-          // setLoading(true);
           if (!wallet) {
-            // showSnackbar(`Please connect wallet first!`, "error");
-            // setLoading(false);
             return;
           }
-          const connection = new Connection(currentNetwork.rpcUrl, "confirmed");
-          console.log(currentNetwork.contractAddress);
-          console.log(currentNetwork.rpcUrl);
 
           const tx = await unstake(
               connection,

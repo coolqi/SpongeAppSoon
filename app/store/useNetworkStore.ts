@@ -21,15 +21,15 @@ interface NetworkStore {
 }
 
 const NETWORKS: Network[] = [
-  {
-    id: "solana",
-    name: "Solana Devnet",
-    rpcUrl: "https://api.devnet.solana.com",
-    contractAddress: "HoU7uBBQf1eqX2StdnCdgA7wuDZB3kyxU1EgpZ6aqPKF",
-    authorityPublicKey: "spngKTnGPcTAauuFR7mEzYBXhCbsAsWdTUghLra91B4",
-    idl: solanaIDL,
-    icon: solanaIcon
-  },
+  // {
+  //   id: "solana",
+  //   name: "Solana Devnet",
+  //   rpcUrl: "https://api.devnet.solana.com",
+  //   contractAddress: "HoU7uBBQf1eqX2StdnCdgA7wuDZB3kyxU1EgpZ6aqPKF",
+  //   authorityPublicKey: "spngKTnGPcTAauuFR7mEzYBXhCbsAsWdTUghLra91B4",
+  //   idl: solanaIDL,
+  //   icon: solanaIcon
+  // },
   {
     id: "soon",
     name: "SOON Testnet",
