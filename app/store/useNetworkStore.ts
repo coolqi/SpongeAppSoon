@@ -1,8 +1,5 @@
 import { create } from "zustand";
-import { IDL as solanaIDL } from '@/program/solana_vault';
 import { IDL as soonIDL } from '@/program/soon_vault';
-import solanaIcon from '@/assets/image/solana.png';
-import soon from '@/assets/image/soon.png';
 
 export interface Network {
   id: string;
@@ -11,7 +8,7 @@ export interface Network {
   contractAddress: string;
   authorityPublicKey: string;
   idl: any;
-  icon: any;
+  icon: string;
 }
 
 interface NetworkStore {
@@ -21,15 +18,6 @@ interface NetworkStore {
 }
 
 const NETWORKS: Network[] = [
-  // {
-  //   id: "solana",
-  //   name: "Solana Devnet",
-  //   rpcUrl: "https://api.devnet.solana.com",
-  //   contractAddress: "HoU7uBBQf1eqX2StdnCdgA7wuDZB3kyxU1EgpZ6aqPKF",
-  //   authorityPublicKey: "spngKTnGPcTAauuFR7mEzYBXhCbsAsWdTUghLra91B4",
-  //   idl: solanaIDL,
-  //   icon: solanaIcon
-  // },
   {
     id: "soon",
     name: "SOON Testnet",
@@ -37,7 +25,7 @@ const NETWORKS: Network[] = [
     contractAddress: "2h1ghABKLrkEPK9YengE7ZBEYep6Dj8BHVQUj3AMde9p",
     authorityPublicKey: "7mddywPSUdnsstKxEmVv54xk5ZcjAp7HsF7ExMUGJpWe",
     idl: soonIDL,
-    icon: soon
+    icon: "/soon.png"
   }
 ];
 

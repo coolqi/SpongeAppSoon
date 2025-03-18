@@ -8,8 +8,7 @@ import dynamic from "next/dynamic";
 const WalletContextProvider = dynamic(
   () => import("./components/ui/walletContextProvider"),
   { 
-    ssr: false,
-    loading: () => <div>Loading wallet...</div>
+    ssr: false 
   }
 );
 
@@ -32,9 +31,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <div className="min-h-screen bg-yellow-50 dark:bg-[#030711]">
+          <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] flex">
             <Navbar />
-            <WalletContextProvider>{children}</WalletContextProvider>
+            <div className="flex-1">
+              <WalletContextProvider>{children}</WalletContextProvider>
+            </div>
           </div>
         </ThemeProvider>
       </body>

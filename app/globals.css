@@ -17,3 +17,31 @@
 body {
   @apply transition-colors duration-200;
 }
+
+/* Mobile navigation styles */
+@media (max-width: 768px) {
+  .nav-hidden {
+    transform: translateX(-100%);
+  }
+  
+  .content-full {
+    margin-left: 0;
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
+}

@@ -14,6 +14,11 @@ export function NetworkSwitcher() {
 
   useClickOutside(dropdownRef, () => setIsOpen(false));
 
+  // If there's only one network, we don't need to show the switcher
+  if (networks.length <= 1) {
+    return null;
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       <NetworkButton

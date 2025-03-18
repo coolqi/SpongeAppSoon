@@ -3,8 +3,7 @@ import Script from "next/script";
 import { Metadata } from "next";
 
 const Homepage = dynamic(() => import("./components/Home"), { 
-  ssr: false,
-  loading: () => <div>Loading...</div>
+  ssr: false
 });
 
 export const metadata: Metadata = {
@@ -15,15 +14,14 @@ export const metadata: Metadata = {
   },
 }
 
-async function DappInterface () {
-
+export default function DappInterface() {
   return (
-    <div>
-      <Homepage/>
-      {/* <SimpleSnackbar /> */}
-      <Script src="https://terminal.jup.ag/main-v1.js" data-preload />
-    </div>
-  )
+    <>
+      <Homepage />
+      <Script 
+        src="https://terminal.jup.ag/main-v1.js" 
+        strategy="afterInteractive"
+      />
+    </>
+  );
 }
-
-export default DappInterface;
