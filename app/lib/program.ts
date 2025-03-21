@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as anchor from "@coral-xyz/anchor";
 import { Program, BN, AnchorProvider } from "@coral-xyz/anchor";
 import {
@@ -9,7 +8,7 @@ import {
 } from "@solana/web3.js";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { Vault as soonVault } from "@/program/soon_vault";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { getAccount } from "@solana/spl-token";
 
 export const getProgram = (
   connection: Connection,
@@ -170,21 +169,14 @@ export const getUserSplBalance = async (
     }
 
     const userPublicKey = wallet.publicKey;
-    const userAta = getAssociatedTokenAddress(
-      tokenMintPublicKey,
-      userPublicKey,
-      false
-    );
+    const tokenAccount = await getAccount(connection, tokenMintPublicKey);
 
-    const accountInfo = await connection.getTokenAccountBalance(userAta);
-    console.log("accountInfo", accountInfo);
-
-    if (!accountInfo) {
+    if (!tokenAccount) {
       console.error("Token account does not exist.");
       return 0;
     }
 
-    return Number(accountInfo.value.amount);
+    return Number(tokenAccount.amount);
   } catch (error) {
     console.error("Error getting user SPL balance:", error);
     return null;

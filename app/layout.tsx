@@ -5,12 +5,7 @@ import Navbar from "./components/Navbar";
 import { ThemeProvider } from "./components/ThemeProvider";
 import dynamic from "next/dynamic";
 
-const WalletContextProvider = dynamic(
-  () => import("./components/ui/walletContextProvider"),
-  { 
-    ssr: false 
-  }
-);
+const Providers = dynamic(() => import("./providers"), { ssr: false });
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,14 +24,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] flex">
-            <Navbar />
-            <div className="flex-1">
-              <WalletContextProvider>{children}</WalletContextProvider>
+          <Providers>
+            <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] flex">
+              <Navbar />
+              <div className="flex-1">
+                {children}
+              </div>
             </div>
-          </div>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

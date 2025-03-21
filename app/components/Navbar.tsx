@@ -9,12 +9,8 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    {
-      icon: "🏠",
-      label: "Discover",
-      href: "/",
-    },
     { icon: "🔄", label: "Swap", href: "https://cobaltx.io/swap/" },
+    { icon: "🌉", label: "Bridge", href: "/bridge" },
     { icon: "🏦", label: "Vault", href: "/vault" },
     { icon: "📊", label: "Portfolio", href: "/portfolio" },
     { icon: "🎁", label: "Referral", href: "/referral" },

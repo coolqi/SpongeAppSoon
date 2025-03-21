@@ -2,12 +2,8 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { UnifiedWalletProvider, useWallet } from "@jup-ag/wallet-adapter";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
-import { BackpackWalletAdapter } from "@solana/wallet-adapter-backpack";
-import { MagicEdenWalletAdapter } from "@solana/wallet-adapter-magiceden";
+import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
+import { SolflareWalletAdapter } from "@solana/wallet-adapter-solflare";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
 import { NetworkSwitcher } from "../network/NetworkSwitcher";
 import axios from "axios";
@@ -38,9 +34,7 @@ const WalletContextProvider: React.FC<{ children: ReactNode }> = (props: {
     <UnifiedWalletProvider
       wallets={[
         new PhantomWalletAdapter(),
-        new SolflareWalletAdapter(),
-        new BackpackWalletAdapter(),
-        new MagicEdenWalletAdapter(),
+        new SolflareWalletAdapter()
       ]}
       config={{
         autoConnect: true,
