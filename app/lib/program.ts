@@ -8,14 +8,14 @@ import {
 } from "@solana/web3.js";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { Vault as soonVault } from "@/program/soon_vault";
-import { getAccount } from "@solana/spl-token";
+import * as token from "@solana/spl-token";
 
 export const getProgram = (
   connection: Connection,
   wallet: AnchorWallet,
   idl: soonVault,
   contractAddress: string,
-  authority: PublicKey // Add authority parameter
+  authority: PublicKey
 ) => {
   const provider = new AnchorProvider(connection, wallet, {
     commitment: "confirmed",
@@ -23,11 +23,11 @@ export const getProgram = (
   anchor.setProvider(provider);
   const program: Program<soonVault> = new Program(
     idl as any,
-    // contractAddress,
+    contractAddress,
     provider
   );
 
-  return { program, provider, authority }; // Return authority if needed
+  return { program, provider, authority };
 };
 
 export const getVault = async (
@@ -35,17 +35,17 @@ export const getVault = async (
   wallet: AnchorWallet,
   idl: any,
   contractAddress: string,
-  authority: PublicKey // Add authority parameter
+  authority: PublicKey
 ) => {
   const { program, provider } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getProgram
+    authority
   );
 
-  const publicKeyBytes = authority.toBytes(); // Use the authority public key
+  const publicKeyBytes = authority.toBytes();
 
   const vaultStatePDA = PublicKey.findProgramAddressSync(
     [Buffer.from("vault_state"), publicKeyBytes],
@@ -71,21 +71,21 @@ export const stake = async (
   amount: number,
   idl: any,
   contractAddress: string,
-  authority: PublicKey // Add authority parameter
+  authority: PublicKey
 ): Promise<Transaction> => {
   const { program, provider } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getProgram
+    authority
   );
   const { vaultStatePDA, vaultPDA, userStatePDA } = await getVault(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getVault
+    authority
   );
 
   return await program.methods
@@ -103,25 +103,25 @@ export const unstake = async (
   amount: number,
   idl: any,
   contractAddress: string,
-  authority: PublicKey // Add authority parameter
+  authority: PublicKey
 ) => {
   const { program, provider } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getProgram
+    authority
   );
   const { vaultStatePDA, vaultPDA, userStatePDA } = await getVault(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getVault
+    authority
   );
 
   return await program.methods
-    .unstakeEth(new BN(amount * LAMPORTS_PER_SOL)) // 0.001 SOL
+    .unstakeEth(new BN(amount * LAMPORTS_PER_SOL))
     .accountsPartial({
       authority: authority,
       user: provider.wallet.publicKey,
@@ -169,14 +169,18 @@ export const getUserSplBalance = async (
     }
 
     const userPublicKey = wallet.publicKey;
-    const tokenAccount = await getAccount(connection, tokenMintPublicKey);
+    const tokenAccount = await token.getAssociatedTokenAddress(
+      tokenMintPublicKey,
+      userPublicKey
+    );
 
-    if (!tokenAccount) {
+    try {
+      const account = await token.getAccount(connection, tokenAccount);
+      return Number(account.amount);
+    } catch (error) {
       console.error("Token account does not exist.");
       return 0;
     }
-
-    return Number(tokenAccount.amount);
   } catch (error) {
     console.error("Error getting user SPL balance:", error);
     return null;
@@ -195,14 +199,14 @@ export const getUserNativeStaked = async (
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getProgram
+    authority
   );
   const { vaultStatePDA, vaultPDA, userStatePDA } = await getVault(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority // Pass authority to getVault
+    authority
   );
 
   try {
