@@ -18,6 +18,8 @@ const nextConfig = {
     };
     return config;
   },
+  // Add output configuration for static exports
+  output: 'standalone',
 }
 
 module.exports = nextConfig

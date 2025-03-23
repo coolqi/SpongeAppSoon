@@ -1,6 +1,7 @@
 'use client';
 import { Input } from "./Input";
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface TokenDataProps {
   symbol: string;
@@ -29,25 +30,47 @@ export default function TokenData({
 }: TokenDataProps) {
   useEffect(() => {
     setValue(amount * currentPrice);
-  }, [amount, currentPrice]);
+  }, [amount, currentPrice, setValue]);
+
+  const getTokenIcon = (symbol: string) => {
+    switch (symbol) {
+      case 'ETH':
+        return 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png';
+      case 'SOL':
+        return '/solana.png';
+      default:
+        return '';
+    }
+  };
 
   return (
     <div>
       <div className="flex items-center justify-between gap-2 mb-2">
-        <select
-          value={selectedToken.symbol}
-          onChange={(e) => {
-            const newToken = supportedTokens.find((t) => t.symbol === e.target.value)!;
-            setSelectedToken(newToken);
-          }}
-          className="bg-gray-900 text-white px-2 py-2 rounded-lg border border-gray-600 min-w-0 w-auto"
-        >
-          {supportedTokens.map((token) => (
-            <option key={token.symbol} value={token.symbol}>
-              {token.symbol} {/* 只顯示 ETH / SOL */}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={selectedToken.symbol}
+            onChange={(e) => {
+              const newToken = supportedTokens.find((t) => t.symbol === e.target.value)!;
+              setSelectedToken(newToken);
+            }}
+            className="bg-gray-900 text-white pl-8 pr-4 py-2 rounded-lg border border-gray-600 min-w-[100px] appearance-none cursor-pointer"
+          >
+            {supportedTokens.map((token) => (
+              <option key={token.symbol} value={token.symbol}>
+                {token.symbol}
+              </option>
+            ))}
+          </select>
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Image
+              src={getTokenIcon(selectedToken.symbol)}
+              alt={selectedToken.symbol}
+              width={20}
+              height={20}
+              className=""
+            />
+          </div>
+        </div>
 
         <div className="inline-flex text-right text-sm text-gray-500 dark:text-gray-400">
           Balance: 
