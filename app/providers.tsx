@@ -9,6 +9,11 @@ const WalletContextProvider = dynamic(
   { ssr: false }
 );
 
+const SimpleSnackbar = dynamic(
+  () => import("./components/ui/SimpleSnackbar"),
+  { ssr: false }
+);
+
 const endpoint = process.env.NEXT_PUBLIC_RPC_ENDPOINT || "https://api.devnet.solana.com";
 const wallets = [
   new PhantomWalletAdapter(),
@@ -21,6 +26,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <WalletProvider wallets={wallets} autoConnect>
         <WalletContextProvider>
           {children}
+          <SimpleSnackbar />
         </WalletContextProvider>
       </WalletProvider>
     </ConnectionProvider>

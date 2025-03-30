@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { IDL as soonIDL } from '@/program/soon_vault';
+import { devnet, mainnet } from '@/config/networks';
+import { idl } from '@/program/soon_vault';
 
 export interface Network {
   id: string;
@@ -11,33 +12,47 @@ export interface Network {
   icon: string;
 }
 
-interface NetworkStore {
+interface NetworkState {
   networks: Network[];
-  currentNetwork: Network;
-  setNetwork: (networkId: string) => void;
+  currentNetwork: {
+    name: string;
+    rpcUrl: string;
+    authorityPublicKey: string;
+  };
+  setCurrentNetwork: (network: string) => void;
 }
 
 const NETWORKS: Network[] = [
   {
     id: "soon",
     name: "SOON Testnet",
-    rpcUrl: "https://rpc.testnet.soo.network/rpc",
-    contractAddress: "2h1ghABKLrkEPK9YengE7ZBEYep6Dj8BHVQUj3AMde9p",
-    authorityPublicKey: "7mddywPSUdnsstKxEmVv54xk5ZcjAp7HsF7ExMUGJpWe",
-    idl: soonIDL,
+    // Original RPC URL (not used directly in browser)
+    rpcUrl: "https://detailed-sharleen-fast-devnet.helius-rpc.com",
+    // rpcUrl: "/api/rpc", // Using our proxy endpoint
+    contractAddress: "9PCuUZGyahj9Akup3qJVrKVVpfhjeNnVnkbrdtJ1RcXm",
+    authorityPublicKey: "5Z4M4kobAYCJ39QFSwP3AXacgngoqE18tYC1Ew32Vqgm",
+    idl: idl,
     icon: "/soon.png"
   }
 ];
 
-const useNetworkStore = create<NetworkStore>((set) => ({
+const useNetworkStore = create<NetworkState>((set) => ({
   networks: NETWORKS,
-  currentNetwork: NETWORKS[0],
-  setNetwork: (networkId: string) => {
-    const network = NETWORKS.find(n => n.id === networkId);
-    if (network) {
-      set({ currentNetwork: network });
-    }
-  }
+  currentNetwork: {
+    name: NETWORKS[0].name,
+    rpcUrl: NETWORKS[0].rpcUrl,
+    authorityPublicKey: NETWORKS[0].authorityPublicKey,
+  },
+  setCurrentNetwork: (networkId) => {
+    const network = NETWORKS.find(n => n.id === networkId) || NETWORKS[0];
+    set(() => ({
+      currentNetwork: {
+        name: network.name,
+        rpcUrl: network.rpcUrl,
+        authorityPublicKey: network.authorityPublicKey,
+      },
+    }));
+  },
 }));
 
 export default useNetworkStore;

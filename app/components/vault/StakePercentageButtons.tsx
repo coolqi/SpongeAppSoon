@@ -1,14 +1,30 @@
 'use client';
 
-export default function StakePercentageButtons() {
+import React, { Dispatch, SetStateAction } from 'react';
+
+interface StakePercentageButtonsProps {
+  balance: number;
+  setStakeAmount: Dispatch<SetStateAction<number>>;
+}
+
+export default function StakePercentageButtons({ 
+  balance, 
+  setStakeAmount 
+}: StakePercentageButtonsProps) {
   const percentages = [25, 50, 75, 100];
+  
+  const handleSetPercentage = (percentage: number) => {
+    const amount = (balance * percentage) / 100;
+    setStakeAmount(amount);
+  };
 
   return (
-    <div className="flex gap-2 mt-4">
+    <div className="grid grid-cols-4 gap-2 mt-4">
       {percentages.map((percentage) => (
         <button
           key={percentage}
-          className="flex-1 py-2 px-3 bg-yellow-200 hover:bg-yellow-300 rounded-xl text-sm font-bold text-black border-2 border-yellow-400 transform hover:scale-105 transition-all"
+          onClick={() => handleSetPercentage(percentage)}
+          className="rounded-lg py-1 px-2 text-sm bg-gray-800 text-white hover:bg-gray-700 transition-colors"
         >
           {percentage}%
         </button>

@@ -2,6 +2,7 @@
 import { Input } from "./Input";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { TokenInfo } from '@/store/useTokenStore';
 
 interface TokenDataProps {
   symbol: string;
@@ -10,10 +11,10 @@ interface TokenDataProps {
   value: number;
   setValue: (amount: number) => void;
   currentPrice: number;
-  balance: number | null;
-  selectedToken: { symbol: string; mint: string };
-  setSelectedToken: (token: { symbol: string; mint: string }) => void;
-  supportedTokens: { symbol: string; mint: string }[];
+  balance: number;
+  selectedToken: TokenInfo;
+  setSelectedToken: (token: TokenInfo) => void;
+  supportedTokens: TokenInfo[];
 }
 
 export default function TokenData({ 
@@ -30,7 +31,7 @@ export default function TokenData({
 }: TokenDataProps) {
   useEffect(() => {
     setValue(amount * currentPrice);
-  }, [amount, currentPrice, setValue]);
+  }, [amount, currentPrice]);
 
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
@@ -74,7 +75,7 @@ export default function TokenData({
 
         <div className="inline-flex text-right text-sm text-gray-500 dark:text-gray-400">
           Balance: 
-          <span className="font-bold ml-1">{balance !== null ? balance.toFixed(4) : "Loading..."}</span>
+          <span className="font-bold ml-1">{balance.toFixed(4)}</span>
           <span className="ml-1">{selectedToken.symbol}</span>
         </div>
       </div>      

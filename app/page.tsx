@@ -7,8 +7,8 @@ import Script from 'next/script';
 
 export default function HomePage() {  
   const SUPPORTED_TOKENS = [
-    { symbol: "ETH", mint: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs" },
-    { symbol: "SOL", mint: "So11111111111111111111111111111111111111112" },
+    { symbol: "ETH", mint: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs", decimals: 9 },
+    { symbol: "SOL", mint: "So11111111111111111111111111111111111111112", decimals: 6 },
   ];
   const [selectedToken, setSelectedToken] = useState(SUPPORTED_TOKENS[0]);
   
@@ -62,7 +62,7 @@ export default function HomePage() {
     handlePrice();
     const interval = setInterval(handlePrice, 10 * 1000);
     return () => clearInterval(interval);
-  }, [selectedToken]);
+  }, [selectedToken.symbol]);
 
   return (
     <>
