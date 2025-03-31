@@ -111,7 +111,7 @@ export const getStakeSplInstructions = async (
     .accounts({
       authority: authority,
       splMint: splMint,
-      user: authority,
+      user: wallet.publicKey,
       tokenProgram: TOKEN_PROGRAM_ID,
     })
     .instruction();
@@ -166,7 +166,6 @@ export const stakeSpl = async (
   );
   return new Transaction().add(instruction);
 };
-
 
 export const unstakeSpl = async (
   connection: Connection,
@@ -346,25 +345,30 @@ export const getStakeNativeInstructions = async (
   contractAddress: string,
   authority: PublicKey
 ): Promise<TransactionInstruction[]> => {
-  const instructions: TransactionInstruction[] = [];
-
-  // Get wrap instructions
-  const wrapInstructions = await getWrapSolInstructions(wallet.publicKey, amount);
-  instructions.push(...wrapInstructions);
-
-  // Add stake instruction
-  const stakeInstruction = await getStakeSplInstructions(
+  const { program } = getProgram(
     connection,
     wallet,
-    amount,
     idl,
     contractAddress,
-    authority,
-    ETH_MINT
+    authority
   );
-  instructions.push(stakeInstruction);
 
-  return instructions;
+  const wrapInstructions = await getWrapSolInstructions(
+    wallet.publicKey,
+    amount
+  );
+
+  const stakeInstruction = await program.methods
+    .stakeSpl(new BN(amount))
+    .accounts({
+      authority: authority,
+      splMint: ETH_MINT,
+      user: wallet.publicKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .instruction();
+
+  return [...wrapInstructions, stakeInstruction];
 };
 
 export const getUnstakeNativeInstructions = async (
@@ -375,25 +379,29 @@ export const getUnstakeNativeInstructions = async (
   contractAddress: string,
   authority: PublicKey
 ): Promise<TransactionInstruction[]> => {
-  const instructions: TransactionInstruction[] = [];
-
-  // Add unstake instruction
-  const unstakeInstruction = await getUnstakeSplInstructions(
+  const { program } = getProgram(
     connection,
     wallet,
-    amount,
     idl,
     contractAddress,
-    authority,
-    ETH_MINT
+    authority
   );
-  instructions.push(unstakeInstruction);
 
-  // Get unwrap instructions
-  const unwrapInstructions = await getUnwrapSolInstructions(wallet.publicKey);
-  instructions.push(...unwrapInstructions);
+  const unstakeInstruction = await program.methods
+    .unstakeSpl(new BN(amount))
+    .accounts({
+      authority: authority,
+      splMint: ETH_MINT,
+      user: wallet.publicKey,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .instruction();
 
-  return instructions;
+  const unwrapInstructions = await getUnwrapSolInstructions(
+    wallet.publicKey,
+  );
+
+  return [unstakeInstruction, ...unwrapInstructions];
 };
 
 export const stakeNative = async (
