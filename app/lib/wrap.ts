@@ -143,5 +143,3 @@ export async function unwrapSol(
     const transaction = new Transaction().add(...instructions);
     return await sendAndConfirmTransaction(connection, transaction, [payer]);
 }
-
-// Example usage

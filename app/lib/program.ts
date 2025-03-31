@@ -378,7 +378,7 @@ export const getUnstakeNativeInstructions = async (
   const instructions: TransactionInstruction[] = [];
 
   // Add unstake instruction
-  const unstakeInstruction = await getStakeSplInstructions(
+  const unstakeInstruction = await getUnstakeSplInstructions(
     connection,
     wallet,
     amount,

@@ -86,9 +86,8 @@ export default function UnstakeCard() {
 
       // Convert UI amount to actual amount with decimals
       const actualUnstakeAmount = unstakeAmount * Math.pow(10, selectedToken.decimals);
-      const actualStakedAmount = stakedAmount * Math.pow(10, selectedToken.decimals);
 
-      if (actualUnstakeAmount > actualStakedAmount) {
+      if (actualUnstakeAmount > stakedAmount) {
         setError("Unstake amount cannot exceed staked amount");
         return;
       }
@@ -162,7 +161,7 @@ export default function UnstakeCard() {
         value={unstakeValue}
         setValue={setUnstakeValue}
         currentPrice={currentPrice}
-        balance={stakedAmount}
+        balance={stakedAmount / Math.pow(10, selectedToken.decimals)}
         selectedToken={selectedToken}
         setSelectedToken={setSelectedToken}
         supportedTokens={supportedTokens}
@@ -187,7 +186,7 @@ export default function UnstakeCard() {
       <MemeButton
         className="w-full mt-6 bg-red-400 hover:bg-red-300 border-red-600"
         onClick={handleUnstake}
-        disabled={loading || unstakeAmount <= 0 }
+        disabled={loading || unstakeAmount <= 0 || (unstakeAmount * Math.pow(10, selectedToken.decimals)) > stakedAmount}
       >
         {loading ? "Processing..." : "Unstake tokens"}
       </MemeButton>

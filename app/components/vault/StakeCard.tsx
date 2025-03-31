@@ -185,7 +185,7 @@ export default function StakeCard() {
       />
 
       <StakePercentageButtons
-        balance={balance / Math.pow(10, selectedToken.decimals)}
+        balance={balance}
         setStakeAmount={setStakeAmount}
       />
 
@@ -195,7 +195,7 @@ export default function StakeCard() {
             Available Balance
           </span>
           <span className="font-bold ml-1">
-            {(balance / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
+            {(balance).toFixed(4)}{" "}
             {selectedToken.symbol}
           </span>
         </div>
