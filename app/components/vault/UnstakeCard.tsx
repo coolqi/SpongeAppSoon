@@ -161,7 +161,7 @@ export default function UnstakeCard() {
         value={unstakeValue}
         setValue={setUnstakeValue}
         currentPrice={currentPrice}
-        balance={stakedAmount / Math.pow(10, selectedToken.decimals)}
+        balance={balance}
         selectedToken={selectedToken}
         setSelectedToken={setSelectedToken}
         supportedTokens={supportedTokens}
