@@ -56,7 +56,6 @@ export default function UnstakeCard() {
         new PublicKey(currentNetwork.authorityPublicKey),
         tokenMint
       );
-      console.log(tokenMint);
       useTokenStore.setState({ stakedAmount: staked || 0 });
     } catch (error) {
       console.error("Error fetching staked amount:", error);
@@ -85,7 +84,11 @@ export default function UnstakeCard() {
         return;
       }
 
-      if (unstakeAmount > stakedAmount) {
+      // Convert UI amount to actual amount with decimals
+      const actualUnstakeAmount = unstakeAmount * Math.pow(10, selectedToken.decimals);
+      const actualStakedAmount = stakedAmount * Math.pow(10, selectedToken.decimals);
+
+      if (actualUnstakeAmount > actualStakedAmount) {
         setError("Unstake amount cannot exceed staked amount");
         return;
       }
@@ -97,7 +100,7 @@ export default function UnstakeCard() {
         tx = await unstakeNative(
           connection,
           wallet as AnchorWallet,
-          unstakeAmount,
+          actualUnstakeAmount,
           idl as SoonVault,
           idl.address,
           new PublicKey(currentNetwork.authorityPublicKey)
@@ -108,7 +111,7 @@ export default function UnstakeCard() {
         tx = await unstakeSpl(
           connection,
           wallet as AnchorWallet,
-          unstakeAmount,
+          actualUnstakeAmount,
           idl as SoonVault,
           idl.address,
           new PublicKey(currentNetwork.authorityPublicKey),
@@ -143,9 +146,7 @@ export default function UnstakeCard() {
   };
 
   // Calculate displayed staked amount based on token decimals
-  const displayStakedAmount = selectedToken.isNative
-    ? stakedAmount
-    : stakedAmount;
+  const displayStakedAmount = stakedAmount / Math.pow(10, selectedToken.decimals);
 
   return (
     <div className="bg-white dark:bg-[#0A0F1C] rounded-2xl p-6 border-4 border-red-400">
@@ -168,7 +169,7 @@ export default function UnstakeCard() {
       />
 
       <StakePercentageButtons
-        balance={stakedAmount}
+        balance={stakedAmount / Math.pow(10, selectedToken.decimals)}
         setStakeAmount={setUnstakeAmount}
       />
 
@@ -178,7 +179,7 @@ export default function UnstakeCard() {
             Staked Amount
           </span>
           <span className="font-bold ml-1">
-            {displayStakedAmount.toFixed(4)} {selectedToken.symbol}
+            {(stakedAmount / Math.pow(10, selectedToken.decimals)).toFixed(4)} {selectedToken.symbol}
           </span>
         </div>
       </div>
@@ -186,7 +187,7 @@ export default function UnstakeCard() {
       <MemeButton
         className="w-full mt-6 bg-red-400 hover:bg-red-300 border-red-600"
         onClick={handleUnstake}
-        disabled={loading || unstakeAmount <= 0 || unstakeAmount > stakedAmount}
+        disabled={loading || unstakeAmount <= 0 }
       >
         {loading ? "Processing..." : "Unstake tokens"}
       </MemeButton>
