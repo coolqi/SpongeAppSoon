@@ -25,7 +25,7 @@ export async function getWrapSolInstructions(
     amount: number
 ): Promise<TransactionInstruction[]> {
     const instructions: TransactionInstruction[] = [];
-    const lamports = amount * LAMPORTS_PER_SOL;
+    const lamports = amount;
     
     // Find the associated token account
     const associatedTokenAccount = await PublicKey.findProgramAddress(

@@ -121,13 +121,16 @@ export default function StakeCard() {
       setLoading(true);
       setError(null);
 
+      // Convert UI amount to actual amount with decimals
+      const actualStakeAmount = stakeAmount * Math.pow(10, selectedToken.decimals);
+
       let transaction: Transaction;
       if (selectedToken.isNative) {
         // For native ETH token, use stakeNative which handles wrapping
         transaction = await stakeNative(
           connection,
           wallet as AnchorWallet,
-          stakeAmount,
+          actualStakeAmount,
           idl as SoonVault,
           idl.address,
           new PublicKey(currentNetwork.authorityPublicKey)
@@ -137,7 +140,7 @@ export default function StakeCard() {
         transaction = await stakeSpl(
           connection,
           wallet as AnchorWallet,
-          stakeAmount,
+          actualStakeAmount,
           idl as SoonVault,
           idl.address,
           new PublicKey(currentNetwork.authorityPublicKey),
@@ -182,7 +185,7 @@ export default function StakeCard() {
       />
 
       <StakePercentageButtons
-        balance={balance}
+        balance={balance / Math.pow(10, selectedToken.decimals)}
         setStakeAmount={setStakeAmount}
       />
 
@@ -192,7 +195,7 @@ export default function StakeCard() {
             Available Balance
           </span>
           <span className="font-bold ml-1">
-            {balance.toFixed(4)}{" "}
+            {(balance / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
             {selectedToken.symbol}
           </span>
         </div>
@@ -201,7 +204,7 @@ export default function StakeCard() {
             Staked Amount
           </span>
           <span className="font-bold ml-1">
-            {stakedAmount.toFixed(4)}{" "}
+            {(stakedAmount / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
             {selectedToken.symbol}
           </span>
         </div>
@@ -210,7 +213,7 @@ export default function StakeCard() {
       <MemeButton
         className="w-full mt-6 bg-green-400 hover:bg-green-300 border-green-600"
         onClick={handleStakeToken}
-        disabled={loading}
+        disabled={loading || stakeAmount <= 0}
       >
         {loading ? "Processing..." : "Stake tokens"}
       </MemeButton>
