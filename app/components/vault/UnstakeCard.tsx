@@ -16,21 +16,17 @@ import useTokenStore from "@/store/useTokenStore";
 import { ETH_MINT, SOL_MINT } from "@/core/setting";
 import { idl, SoonVault } from "@/program/soon_vault";
 
-interface UnstakeCardProps {
-  tokenSymbol: string;
-  currentPrice: number;
-  selectedToken: { symbol: string; mint: string; decimals: number; isNative: boolean };
-  setSelectedToken: (token: { symbol: string; mint: string; decimals: number; isNative: boolean }) => void;
-  supportedTokens: { symbol: string; mint: string; decimals: number; isNative: boolean }[];
-}
-
-export default function UnstakeCard({
-  tokenSymbol,
-  currentPrice,
-  selectedToken,
-  setSelectedToken,
-  supportedTokens,
-}: UnstakeCardProps) {
+export default function UnstakeCard() {
+  const {
+    selectedToken,
+    supportedTokens,
+    setSelectedToken,
+    balance,
+    stakedAmount,
+    setBalance,
+    setStakedAmount,
+    getTokenMint,
+  } = useTokenStore();
   const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
   const wallet = useAnchorWallet();
@@ -38,9 +34,7 @@ export default function UnstakeCard({
   const [unstakeValue, setUnstakeValue] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Get staked amount from token store
-  const { stakedAmount, getTokenMint } = useTokenStore();
+  const currentPrice = selectedToken.decimals;
 
   // Create connection using useMemo to prevent recreation on every render
   const connection = useMemo(() => {
@@ -62,7 +56,7 @@ export default function UnstakeCard({
         new PublicKey(currentNetwork.authorityPublicKey),
         tokenMint
       );
-      
+      console.log(tokenMint);
       useTokenStore.setState({ stakedAmount: staked || 0 });
     } catch (error) {
       console.error("Error fetching staked amount:", error);
@@ -122,7 +116,9 @@ export default function UnstakeCard({
         );
       }
 
-      const signature = await sendTransaction(tx, connection, {skipPreflight: true});
+      const signature = await sendTransaction(tx, connection, {
+        skipPreflight: true,
+      });
       console.log(`Transaction sent: ${signature}`);
 
       // Show success message temporarily
@@ -147,8 +143,8 @@ export default function UnstakeCard({
   };
 
   // Calculate displayed staked amount based on token decimals
-  const displayStakedAmount = selectedToken.isNative 
-    ? stakedAmount 
+  const displayStakedAmount = selectedToken.isNative
+    ? stakedAmount
     : stakedAmount;
 
   return (
@@ -159,7 +155,7 @@ export default function UnstakeCard({
         </div>
       )}
       <TokenData
-        symbol={tokenSymbol}
+        symbol={selectedToken.symbol}
         amount={unstakeAmount}
         setAmount={setUnstakeAmount}
         value={unstakeValue}
@@ -182,8 +178,7 @@ export default function UnstakeCard({
             Staked Amount
           </span>
           <span className="font-bold ml-1">
-            {displayStakedAmount.toFixed(4)}{" "}
-            {selectedToken.symbol}
+            {displayStakedAmount.toFixed(4)} {selectedToken.symbol}
           </span>
         </div>
       </div>
