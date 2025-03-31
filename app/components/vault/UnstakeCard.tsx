@@ -9,11 +9,11 @@ import {
   AnchorWallet,
 } from "@solana/wallet-adapter-react";
 import { useState, useEffect, useMemo } from "react";
-import { unstakeSpl } from "@/lib/program";
+import { unstakeSpl, unstakeNative, getUserSplStaked } from "@/lib/program";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
-import { SOL_MINT } from "@/core/setting";
+import { ETH_MINT, SOL_MINT } from "@/core/setting";
 import { idl, SoonVault } from "@/program/soon_vault";
 
 interface UnstakeCardProps {
@@ -40,18 +40,41 @@ export default function UnstakeCard({
   const [error, setError] = useState<string | null>(null);
 
   // Get staked amount from token store
-  const { stakedAmount } = useTokenStore();
+  const { stakedAmount, getTokenMint } = useTokenStore();
 
   // Create connection using useMemo to prevent recreation on every render
   const connection = useMemo(() => {
     return new Connection(currentNetwork.rpcUrl, "confirmed");
   }, [currentNetwork.rpcUrl]);
 
-  // Reset amount when token changes
+  // Fetch staked amount when token changes
+  const fetchStakedAmount = async () => {
+    if (!wallet) return;
+
+    try {
+      const tokenMint = getTokenMint(selectedToken.symbol);
+
+      const staked = await getUserSplStaked(
+        connection,
+        wallet,
+        idl as SoonVault,
+        idl.address,
+        new PublicKey(currentNetwork.authorityPublicKey),
+        tokenMint
+      );
+      
+      useTokenStore.setState({ stakedAmount: staked || 0 });
+    } catch (error) {
+      console.error("Error fetching staked amount:", error);
+    }
+  };
+
+  // Reset amount when token changes and fetch updated staked amount
   useEffect(() => {
     setUnstakeAmount(0);
     setUnstakeValue(0);
-  }, [selectedToken]);
+    fetchStakedAmount();
+  }, [selectedToken, wallet, connection]);
 
   const handleUnstake = async () => {
     if (!wallet) {
@@ -68,23 +91,51 @@ export default function UnstakeCard({
         return;
       }
 
-      // If it's a native token, we need to wrap it first
-      const tokenMint = selectedToken.isNative ? SOL_MINT : new PublicKey(selectedToken.mint);
-      const rawAmount = unstakeAmount * Math.pow(10, selectedToken.decimals);
+      if (unstakeAmount > stakedAmount) {
+        setError("Unstake amount cannot exceed staked amount");
+        return;
+      }
 
-      const tx = await unstakeSpl(
-        connection,
-        wallet as AnchorWallet,
-        rawAmount,
-        idl as SoonVault,
-        idl.address,
-        new PublicKey(currentNetwork.authorityPublicKey),
-        tokenMint
-      );
-      
-      const signature = await sendTransaction(tx, connection);
+      let tx;
+      if (selectedToken.isNative) {
+        // Use native token unstaking method for ETH
+        console.log("Unstaking native token:", selectedToken.symbol);
+        tx = await unstakeNative(
+          connection,
+          wallet as AnchorWallet,
+          unstakeAmount,
+          idl as SoonVault,
+          idl.address,
+          new PublicKey(currentNetwork.authorityPublicKey)
+        );
+      } else {
+        // Use SPL token unstaking method
+        console.log("Unstaking SPL token:", selectedToken.symbol);
+        tx = await unstakeSpl(
+          connection,
+          wallet as AnchorWallet,
+          unstakeAmount,
+          idl as SoonVault,
+          idl.address,
+          new PublicKey(currentNetwork.authorityPublicKey),
+          new PublicKey(selectedToken.mint)
+        );
+      }
+
+      const signature = await sendTransaction(tx, connection, {skipPreflight: true});
       console.log(`Transaction sent: ${signature}`);
+
+      // Show success message temporarily
       setError("Transaction sent successfully!");
+
+      // Refresh staked amount after a delay to allow transaction to process
+      setTimeout(() => {
+        fetchStakedAmount();
+        setError(null);
+      }, 2000);
+
+      // Reset unstake amount
+      setUnstakeAmount(0);
     } catch (error) {
       console.error("Error unstaking:", error);
       setError(
@@ -94,6 +145,11 @@ export default function UnstakeCard({
       setLoading(false);
     }
   };
+
+  // Calculate displayed staked amount based on token decimals
+  const displayStakedAmount = selectedToken.isNative 
+    ? stakedAmount 
+    : stakedAmount;
 
   return (
     <div className="bg-white dark:bg-[#0A0F1C] rounded-2xl p-6 border-4 border-red-400">
@@ -126,7 +182,7 @@ export default function UnstakeCard({
             Staked Amount
           </span>
           <span className="font-bold ml-1">
-            {(stakedAmount / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
+            {displayStakedAmount.toFixed(4)}{" "}
             {selectedToken.symbol}
           </span>
         </div>
@@ -135,7 +191,7 @@ export default function UnstakeCard({
       <MemeButton
         className="w-full mt-6 bg-red-400 hover:bg-red-300 border-red-600"
         onClick={handleUnstake}
-        disabled={loading}
+        disabled={loading || unstakeAmount <= 0 || unstakeAmount > stakedAmount}
       >
         {loading ? "Processing..." : "Unstake tokens"}
       </MemeButton>

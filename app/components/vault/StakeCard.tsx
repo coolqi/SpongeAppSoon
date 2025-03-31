@@ -20,6 +20,8 @@ import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import { idl, SoonVault } from "@/program/soon_vault";
 import { token } from "@coral-xyz/anchor/dist/cjs/utils";
+import { Transaction } from "@solana/web3.js";
+import { stakeNative } from "@/lib/program";
 
 export default function StakeCard() {
   const { sendTransaction } = useWallet();
@@ -105,61 +107,55 @@ export default function StakeCard() {
   }, [wallet, currentNetwork.rpcUrl, selectedToken, connection, setBalance, setStakedAmount, getTokenMint]);
 
   const handleStakeToken = async () => {
-    if (!wallet) {
-      setError("Please connect your wallet");
+    if (!wallet || !connection) {
+      setError("Wallet not connected");
+      return;
+    }
+
+    if (!stakeAmount || stakeAmount <= 0) {
+      setError("Please enter a valid stake amount");
       return;
     }
 
     try {
       setLoading(true);
-      setError(null); // Clear any previous errors
+      setError(null);
 
-      if (stakeAmount <= 0) {
-        setError("Please enter a valid amount");
-        return;
-      }
-
-      const tokenMint = getTokenMint(selectedToken.symbol);
-      const rawAmount = stakeAmount * Math.pow(10, selectedToken.decimals); // Convert to token units
-
-      let tx;
+      let transaction: Transaction;
       if (selectedToken.isNative) {
-        // Use native token staking method for ETH
-        console.log("Staking native token: ETH");
-        // TODO: Implement native token staking
-        setError("Native token staking not yet implemented");
-        return;
-      } else {
-        // Use SPL token staking method
-        console.log("Staking SPL token:", selectedToken.symbol);
-        tx = await stakeSpl(
+        // For native ETH token, use stakeNative which handles wrapping
+        transaction = await stakeNative(
           connection,
           wallet as AnchorWallet,
-          rawAmount,
+          stakeAmount,
+          idl as SoonVault,
+          idl.address,
+          new PublicKey(currentNetwork.authorityPublicKey)
+        );
+      } else {
+        // For SPL tokens
+        transaction = await stakeSpl(
+          connection,
+          wallet as AnchorWallet,
+          stakeAmount,
           idl as SoonVault,
           idl.address,
           new PublicKey(currentNetwork.authorityPublicKey),
-          tokenMint
+          new PublicKey(selectedToken.mint)
         );
       }
 
-      console.log("tx after");
-      if (tx) {
-        const latestBlockHash = await connection.getLatestBlockhash();
-        tx.lastValidBlockHeight = latestBlockHash.lastValidBlockHeight;
-        const signature = await sendTransaction(tx, connection, {skipPreflight: true});
-        console.log(`Transaction sent: ${signature}`);
+      // Sign and send transaction
+      const latestBlockHash = await connection.getLatestBlockhash();
+      transaction.lastValidBlockHeight = latestBlockHash.lastValidBlockHeight;
 
-        // Refresh balances after successful transaction
-        setTimeout(() => {
-          fetchBalances();
-        }, 2000);
-      }
+      const signature = await sendTransaction(transaction, connection, {skipPreflight: true});
+
+      console.log("Transaction confirmed:", signature);
+      fetchBalances();
     } catch (error) {
-      console.error("Error staking:", error);
-      setError(
-        error instanceof Error ? error.message : "Failed to stake tokens"
-      );
+      console.error("Error staking tokens:", error);
+      setError("Failed to stake tokens. Please try again.");
     } finally {
       setLoading(false);
     }
