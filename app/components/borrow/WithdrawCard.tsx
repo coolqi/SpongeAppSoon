@@ -1,7 +1,6 @@
 "use client";
 
 import { MemeButton } from "../ui/MemeButton";
-import TokenData from "./TokenData";
 import {
   useWallet,
   useAnchorWallet,
@@ -21,13 +20,19 @@ import {
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
+import useTokenStore from "@/store/useTokenStore";
 import { idl, SoonVault } from "@/program/soon_vault";
 import { token } from "@coral-xyz/anchor/dist/cjs/utils";
 import { Transaction } from "@solana/web3.js";
 import { stakeNative } from "@/lib/program";
-import useStakeStore from "@/store/useStakeStore";
+import TokenData from "./TokenData";
+import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
 
-export default function StakeCard() {
+interface WithdrawCardProps {
+  connected: boolean;
+}
+
+export default function WithdrawCard({ connected }: WithdrawCardProps) {
   const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
   const wallet = useAnchorWallet();
@@ -51,7 +56,7 @@ export default function StakeCard() {
     setBalance,
     setStakedAmount,
     getTokenMint,
-  } = useStakeStore();
+  } = useTokenStore();
 
   const tokenSymbol = selectedToken.symbol;
   const currentPrice = selectedToken.decimals;
@@ -118,14 +123,14 @@ export default function StakeCard() {
     getTokenMint,
   ]);
 
-  const handleStakeToken = async () => {
+  const handleWithdraw = async () => {
     if (!wallet || !connection) {
       setError("Wallet not connected");
       return;
     }
 
     if (!stakeAmount || stakeAmount <= 0) {
-      setError("Please enter a valid stake amount");
+      setError("Please enter a valid withdraw amount");
       return;
     }
 
@@ -172,8 +177,8 @@ export default function StakeCard() {
       console.log("Transaction confirmed:", signature);
       fetchBalances();
     } catch (error) {
-      console.error("Error staking tokens:", error);
-      setError("Failed to stake tokens. Please try again.");
+      console.error("Error withdraw:", error);
+      setError("Failed to withdraw. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -200,32 +205,20 @@ export default function StakeCard() {
           supportedTokens={supportedTokens}
         />
       </div>
-      <div className="-mt-1 space-y-0">
-        <div className="flex justify-between items-center text-gray-dark/70 font-medium dark:text-gray-400 ">
-          {/* {stakeValue.toFixed(2)} USDC */}
-          <span className=" dark:text-gray-400">Supply</span>
-          <span className=" dark:text-gray-400">20M</span>
-        </div>
-        <div className="flex justify-between items-center text-gray-dark/70 font-medium">
-          {/* <span className=" dark:text-gray-400">
-            Staked Amount
-          </span>
-          <span>
-            {(stakedAmount / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
-            {selectedToken.symbol}
-          </span> */}
-          <span className=" dark:text-gray-400">Projected APY</span>
-          <span className=" dark:text-gray-400">8.49%</span>
-        </div>
-      </div>
       <Separator.Root className="bg-green-dark w-full h-1" />
-      <MemeButton
-        className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
-        onClick={handleStakeToken}
-        disabled={loading || stakeAmount <= 0}
-      >
-        {loading ? "Processing..." : "Stake"}
-      </MemeButton>
+      {connected ? (
+        <MemeButton
+          className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
+          onClick={handleWithdraw}
+          disabled={loading || stakeAmount <= 0}
+        >
+          {loading ? "Processing..." : "Withdraw"}
+        </MemeButton>
+      ) : (
+        <div className="rounded-full mt-0 w-full bg-yellow-light hover:bg-yellow-dark font-bold">
+          <UnifiedWalletButton buttonClassName="!transform !hover:scale-105 !transition-all !border-4 !border-black !rounded-full !w-full !py-3 !px-6 !text-base !flex !items-center !justify-center !bg-yellow-light" />
+        </div>
+      )}
     </div>
   );
 }

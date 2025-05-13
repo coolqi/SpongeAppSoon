@@ -4,10 +4,10 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { TokenInfo } from "@/store/useTokenStore";
 import { Select, SelectItem } from "../ui/Select";
-import StakePercentageButtons from "./StakePercentageButtons";
+import PercentageButtons from "../ui/PercentageButtons";
 
 interface TokenDataProps {
-  isUnstake?: boolean;
+  isBorrow?: boolean;
   symbol: string;
   amount: number;
   setAmount: (amount: number) => void;
@@ -21,7 +21,7 @@ interface TokenDataProps {
 }
 
 export default function TokenData({
-  isUnstake,
+  isBorrow,
   symbol,
   amount,
   setAmount,
@@ -39,10 +39,16 @@ export default function TokenData({
 
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
-      case "mvmUSD": 
-        return "/cash.png";
-      case "USD*": 
-        return "/usd.png";
+      case "ETH":
+        return "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
+      case "SOL":
+        return "/solana.png";
+      case 'JupSOL':
+        return '/jupsol.png';
+      case 'JitoSOL':
+        return '/jitosol.png';
+      case 'BNSOL':
+        return '/bnsol.png';
       default:
         return "";
     }
@@ -52,12 +58,13 @@ export default function TokenData({
     <div>
       <div className="grid gap-1">
         <section className="flex items-center justify-between">
-          <div className="text-xs font-medium">{isUnstake ? 'You unstake: ': 'You stake: '}</div>
+          <div className="text-xs font-medium">{isBorrow ? 'You borrow: ': 'You withdraw: '}</div>
           <div></div>
         </section>
         <section className="flex items-center justify-between gap-2">
           <Select
-            className="w-[188px] rounded-md"
+            className="min-w-[158px] max-w-[180px] rounded-md"
+            placeholder="Select token"
             onValueChange={(value) => {
               const newToken = supportedTokens.find((t) => t.symbol === value)!;
               setSelectedToken(newToken);
@@ -69,11 +76,16 @@ export default function TokenData({
                   <Image
                     src={getTokenIcon(token.symbol)}
                     alt={token.symbol}
-                    width={20}
-                    height={20}
+                    width={26}
+                    height={26}
                     className="pointer-events-none"
                   />
-                  {token.symbol}
+                  <div className="grid gap-0">
+                    {token.symbol}
+                    {isBorrow ? <div className="text-xs font-normal text-green-lightest">
+                      8% APY
+                    </div>: null}
+                  </div>
                 </div>
               </SelectItem>
             ))}
@@ -90,21 +102,22 @@ export default function TokenData({
             }}
             onChange={(e) => {
               const newAmount = parseFloat(e.target.value);
+              console.log('newAmount', newAmount);
               setAmount(isNaN(newAmount) ? 0 : newAmount);
             }}
             className="text-right text-xl"
           />
         </section>
         <section className="mt-1 flex items-center justify-between text-sm dark:text-gray-400">
-          <p className="font-medium">Wallet:</p>
+          <p className="font-medium">{isBorrow ? 'Max borrow ': 'Available to withdraw '}:</p>
           <div className="flex items-center justify-end gap-2">
             <div className="flex items-center gap-1">
               <span className="font-bold ml-1">{balance.toFixed(4)}</span>
-              <span className="ml-1">CASH</span>
+              <span className="ml-1">{selectedToken.symbol}</span>
             </div>
-            <StakePercentageButtons
+            <PercentageButtons
               balance={balance}
-              setStakeAmount={setAmount}
+              setAmount={setAmount}
             />
           </div>
         </section>

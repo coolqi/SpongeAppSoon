@@ -37,6 +37,6 @@ export default function JupiterClient() {
   }, [wallet, endpoint]);
 
   return (
-    <div id="jupiter-terminal" className="w-full h-[600px]"></div>
+    <div id="jupiter-terminal" className="w-full min-h-[360px]"></div>
   );
 }

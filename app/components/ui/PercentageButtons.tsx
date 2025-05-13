@@ -1,15 +1,13 @@
 'use client';
 
-import React, { Dispatch, SetStateAction } from 'react';
-
 interface StakePercentageButtonsProps {
   balance: number;
-  setStakeAmount: (val: number) => void;
+  setAmount: (val: number) => void;
 }
 
-export default function StakePercentageButtons({ 
+export default function PercentageButtons({ 
   balance, 
-  setStakeAmount 
+  setAmount 
 }: StakePercentageButtonsProps) {
   const percentages = [{
     value: 50,
@@ -21,7 +19,7 @@ export default function StakePercentageButtons({
   
   const handleSetPercentage = (percentage: number) => {
     const amount = (balance * percentage) / 100;
-    setStakeAmount(amount);
+    setAmount(amount);
   };
 
   return (

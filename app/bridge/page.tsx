@@ -8,15 +8,13 @@ export default function BridgePage() {
   const [selectedBridge, setSelectedBridge] = useState<'solana' | 'eth' | null>(null);
 
   return (
-    <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] text-black dark:text-white">
-      <main className="ml-64 p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-semibold mb-6">Bridge</h1>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="flex items-center justify-center text-black dark:text-white">
+      <main className="w-full max-w-4xl p-8 bg-green-light rounded-xl mt-20 border-4 border-black">
+        <div className="">          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
             {/* Bridge for Solana */}
             <div 
-              className={`bg-white dark:bg-[#0A0F1C] rounded-xl p-6 border-4 ${
+              className={`bg-green-light dark:bg-[#0A0F1C] rounded-xl p-6 border-4 ${
                 selectedBridge === 'solana' ? 'border-purple-400' : 'border-gray-200 dark:border-gray-800'
               } cursor-pointer transition-all hover:transform hover:scale-105`}
               onClick={() => setSelectedBridge('solana')}
@@ -49,7 +47,7 @@ export default function BridgePage() {
 
             {/* Bridge from ETH */}
             <div 
-              className={`bg-white dark:bg-[#0A0F1C] rounded-xl p-6 border-4 ${
+              className={`bg-green-light dark:bg-[#0A0F1C] rounded-xl p-6 border-4 ${
                 selectedBridge === 'eth' ? 'border-blue-400' : 'border-gray-200 dark:border-gray-800'
               } cursor-pointer transition-all hover:transform hover:scale-105`}
               onClick={() => setSelectedBridge('eth')}
@@ -82,7 +80,7 @@ export default function BridgePage() {
           </div>
 
           {/* Additional Information */}
-          <div className="mt-8 bg-white dark:bg-[#0A0F1C] rounded-xl p-6 border-4 border-yellow-400">
+          <div className="mt-8 bg-green-light dark:bg-[#0A0F1C] rounded-xl p-6 border-4 border-yellow-400">
             <h2 className="text-xl font-semibold mb-4">Bridge Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">

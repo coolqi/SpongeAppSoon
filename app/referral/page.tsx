@@ -25,33 +25,32 @@ export default function ReferralPage() {
   };
 
   return (
-    <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] text-black dark:text-white">
-      <main className="ml-64 p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-semibold mb-6">Referral Program</h1>
-          
-          <div className="bg-white dark:bg-[#0A0F1C] rounded-xl p-6 border-4 border-purple-400">
+    <div className="h-full flex flex-col justify-center mt-[-80px] text-black dark:text-white">
+      <main className="w-full p-8">
+        <div className="max-w-5xl mx-auto">
+          {/* <h1 className="text-2xl font-semibold mb-6">Referral Program</h1> */}
+          <div className="bg-green-light dark:bg-[#0A0F1C] rounded-xl p-6 border-4 border-black">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Earn More with Referrals 🎁</h2>
-              <div className="px-4 py-2 bg-purple-100 dark:bg-[#1A1F2E] rounded-lg">
-                <span className="text-sm text-purple-600 dark:text-purple-400">Earn extra 10% of referral earnings</span>
+              <div className="px-4 py-2 bg-green-light border-2 border-black dark:bg-[#1A1F2E] rounded-lg">
+                <span className="text-sm bg-green-light dark:text-purple-400">Earn extra 10% of referral earnings</span>
               </div>
             </div>
             
             <div className="space-y-6">
-              <div className="p-6 bg-yellow-100 dark:bg-[#1A1F2E] rounded-xl border-2 border-yellow-300 dark:border-yellow-600">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Your Referral Link</p>
+              <div className="p-6 bg-green-light dark:bg-[#1A1F2E] rounded-xl border-2 border-black dark:border-yellow-600">
+                <p className="text-sm dark:text-gray-400 mb-4">Your Referral Link</p>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
                     value={wallet ? referralLink : "Connect wallet to get your referral link"}
-                    className="flex-1 bg-white dark:bg-[#0A0F1C] border-2 border-yellow-300 dark:border-yellow-600 rounded-lg px-4 py-3 text-sm"
+                    className="flex-1 bg-green-dark dark:bg-[#0A0F1C] border-2 border-black dark:border-yellow-600 rounded-lg px-4 py-3 text-sm"
                   />
                   <button
                     onClick={handleCopyReferral}
                     disabled={!wallet}
-                    className="px-6 py-3 bg-green-400 text-black rounded-lg hover:bg-green-300 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-green-600 transition-all"
+                    className="px-6 py-3 bg-yellow-light text-black rounded-lg hover:bg-yellow-dark disabled:opacity-50 disabled:cursor-not-allowed border-2 border-black transition-all"
                   >
                     {copied ? "Copied! ✓" : "Copy 📋"}
                   </button>
@@ -73,7 +72,7 @@ export default function ReferralPage() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#1A1F2E] rounded-xl p-6 border-2 border-gray-200 dark:border-gray-800">
+              <div className="bg-green-light dark:bg-[#1A1F2E] rounded-xl p-6 border-2 border-black dark:border-gray-800">
                 <h3 className="text-lg font-semibold mb-4">How it Works</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="space-y-2">
