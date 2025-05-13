@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { PublicKey } from '@solana/web3.js';
-import { SOL_MINT, ETH_MINT, JupSQL_MINT, JITOSOL_MINT, JUPSOL_MINT, BNSOL_MINT } from '@/core/setting';
+import { SOL_MINT, ETH_MINT, JITOSOL_MINT, JUPSOL_MINT, BNSOL_MINT } from '@/core/setting';
 
 export interface TokenInfo {
   symbol: string;

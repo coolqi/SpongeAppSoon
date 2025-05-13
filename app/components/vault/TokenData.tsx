@@ -100,7 +100,7 @@ export default function TokenData({
           <div className="flex items-center justify-end gap-2">
             <div className="flex items-center gap-1">
               <span className="font-bold ml-1">{balance.toFixed(4)}</span>
-              <span className="ml-1">CASH</span>
+              <span className="ml-1">mvmUSD</span>
             </div>
             <StakePercentageButtons
               balance={balance}

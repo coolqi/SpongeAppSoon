@@ -18,7 +18,7 @@ const nanum = Nanum_Pen_Script({
 
 export const metadata: Metadata = {
   title: "Sponge",
-  description: "Stake SOL, Get Exposure from Bluechips",
+  description: "Multi-VM stablecoin protocol",
   icons: {
     icon: "/sponge.svg",
   },
