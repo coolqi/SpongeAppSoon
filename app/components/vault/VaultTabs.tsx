@@ -1,5 +1,6 @@
 "use client";
 
+import { CardContainer } from "../ui/Container";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import StakeCard from "./StakeCard";
 import UnstakeCard from "./UnstakeCard";
@@ -34,36 +35,35 @@ export default function VaultTabs({
   supportedTokens,
 }: VaultTabsProps) {
   return (
-    <div className="bg-yellow-100 dark:bg-[#1A1F2E] rounded-3xl border-4 border-blue-400 p-6">
-      <div className="text-2xl font-bold mb-6 text-center">Sponge Vault</div>
-      <Tabs defaultValue="stake" className="w-full">
-        <TabsList className="w-full mb-6 bg-yellow-200 dark:bg-[#141921] p-2 rounded-2xl border-4 border-yellow-400">
-          <TabsTrigger
-            value="stake"
-            className="w-1/2 data-[state=active]:bg-green-400 data-[state=active]:text-white font-bold"
-          >
-            Stake
-          </TabsTrigger>
-          <TabsTrigger
-            value="unstake"
-            className="w-1/2 data-[state=active]:bg-red-400 data-[state=active]:text-white font-bold"
-          >
-            Unstake
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="stake" className="mt-0">
-          <StakeCard />
-        </TabsContent>
+    <CardContainer>
+        <Tabs defaultValue="stake" className="">
+          <TabsList className="w-auto mb-6 bg-green-dark p-2 rounded-2xl border-4 border-black text-black/60 text-[15px]">
+            <TabsTrigger
+              value="stake"
+              className="px-2 py-1 data-[state=active]:bg-green-light data-[state=active]:shadow-inner-green data-[state=active]:border-green-lighter data-[state=active]:text-black font-bold"
+            >
+              Stake
+            </TabsTrigger>
+            <TabsTrigger
+              value="unstake"
+              className="px-2 py-1 data-[state=active]:bg-green-light data-[state=active]:shadow-inner-green data-[state=active]:border-green-lighter data-[state=active]:text-black font-bold"
+            >
+              Unstake
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="stake" className="mt-0">
+            <StakeCard />
+          </TabsContent>
 
-        <TabsContent value="unstake" className="mt-0">
-          <UnstakeCard
-            {...unstakeData}
-            selectedToken={selectedToken}
-            setSelectedToken={setSelectedToken}
-            supportedTokens={supportedTokens}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="unstake" className="mt-0">
+            <UnstakeCard
+              // {...unstakeData}
+              // selectedToken={selectedToken}
+              // setSelectedToken={setSelectedToken}
+              // supportedTokens={supportedTokens}
+            />
+          </TabsContent>
+        </Tabs>
+    </CardContainer>
   );
 }

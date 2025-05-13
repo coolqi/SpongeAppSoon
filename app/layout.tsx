@@ -1,13 +1,20 @@
 import "./globals.css";
 import { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Nanum_Pen_Script } from "next/font/google";
 import Navbar from "./components/Navbar";
 import { ThemeProvider } from "./components/ThemeProvider";
 import dynamic from "next/dynamic";
+import { twMerge } from "tailwind-merge";
 
 const Providers = dynamic(() => import("./providers"), { ssr: false });
 
 const inter = Inter({ subsets: ["latin"] });
+
+const nanum = Nanum_Pen_Script({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-nanum',
+});
 
 export const metadata: Metadata = {
   title: "Sponge",
@@ -24,15 +31,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+      <body className={twMerge(inter.className, nanum.variable)}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Providers>
-            <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] flex">
-              <Navbar />
-              <div className="flex-1">
+            <Navbar />
+              <div className="h-full flex-1">
                 {children}
               </div>
-            </div>
           </Providers>
         </ThemeProvider>
       </body>

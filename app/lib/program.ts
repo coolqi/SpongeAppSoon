@@ -9,6 +9,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from "@solana/web3.js";
+
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { SoonVault } from "@/program/soon_vault";
 import {
@@ -17,7 +18,6 @@ import {
   NATIVE_MINT,
 } from "@solana/spl-token";
 import * as token from "@solana/spl-token";
-import { getAccountInfo, getAssociatedTokenAddress } from "@solana/spl-token";
 import { getWrapSolInstructions, getUnwrapSolInstructions } from "./wrap";
 import { ETH_MINT } from "@/core/setting";
 

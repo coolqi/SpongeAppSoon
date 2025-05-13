@@ -1,7 +1,7 @@
 export default function DocsPage() {
   return (
-    <div className="min-h-screen bg-yellow-50 dark:bg-[#030711] text-black dark:text-white">
-      <main className="ml-64 p-8">
+    <div className=" bg-yellow-50 dark:bg-[#030711] text-black dark:text-white">
+      <main className="p-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-semibold mb-6">Documentation</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
