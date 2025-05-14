@@ -11,5 +11,3 @@ export const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyT
 export const JITOSOL_MINT = new PublicKey("J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn");
 export const JUPSOL_MINT = new PublicKey("jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v");
 export const BNSOL_MINT = new PublicKey("BNSQL1nq3v2k5Z7x8z9g6J4v5Q6f8f6sZdosWBjx93v");
-
-export const SOLEND_PROGRAM_ID = new PublicKey("So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo");

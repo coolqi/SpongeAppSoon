@@ -147,6 +147,7 @@ export async function getPoolDetail(
         tokenAAmount: "0",
         lendingReceiptAmount: "0",
         cashAmount: "0",
+        userSCashAmount: '0'
       },
     };
   }

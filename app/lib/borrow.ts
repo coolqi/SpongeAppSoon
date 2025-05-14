@@ -1,13 +1,12 @@
 import * as anchor from '@coral-xyz/anchor';
-import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
 import { Idl } from '@coral-xyz/anchor';
 import fallIdl from './cash.json';
 import BN from 'bn.js';
 import { AUTHORITY_SEED, LENDING_TOKEN_SEED, CASH_TOKEN_SEED } from './constants';
 import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token';
 
-const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
-export const getSolBalance = async (walletPublicKey: PublicKey) => {
+export const getSolBalance = async (connection: Connection, walletPublicKey: PublicKey) => {
   if (!walletPublicKey) return 0;
 
   const lamports = await connection.getBalance(walletPublicKey);
@@ -20,6 +19,10 @@ export const getMockQuote = (amountSOL: number) => {
   const fakeRate = Math.pow(10, 9);
   return amountSOL * fakeRate;
 };
+
+export const getInputBalance = (balance: number) => {
+  return balance / Math.pow(10, 9);
+}
 
 export const borrow = async (
   wallet: any,

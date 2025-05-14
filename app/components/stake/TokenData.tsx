@@ -4,9 +4,9 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { TokenInfo } from "@/store/useTokenStore";
 import { Select, SelectItem } from "../ui/Select";
-import StakePercentageButtons from "./StakePercentageButtons";
 import { Spinner } from "../ui/Spinner";
 import { formatAmount } from "@/lib/amount";
+import PercentageButtons from "../ui/PercentageButtons";
 
 interface TokenDataProps {
   isUnstake?: boolean;
@@ -31,6 +31,7 @@ export default function TokenData({
   currentPrice,
   balance,
   loading,
+  selectedToken,
   setSelectedToken,
   supportedTokens,
 }: TokenDataProps) {
@@ -41,6 +42,7 @@ export default function TokenData({
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
       case "mvmUSD":
+      case "stmvmUSD":
         return "/cash.png";
       case "USD*":
         return "/usd.png";
@@ -59,7 +61,7 @@ export default function TokenData({
         </section>
         <section className="flex items-center justify-between gap-2">
           <Select
-            className="w-[188px] rounded-md"
+            className="min-w-[148px] max-w-[168px] rounded-md"
             onValueChange={(value) => {
               const newToken = supportedTokens.find((t) => t.symbol === value)!;
               setSelectedToken(newToken);
@@ -109,13 +111,9 @@ export default function TokenData({
                   {formatAmount(parseFloat(balance.toFixed(4)))}
                 </span>
               )}
-
-              <span className="ml-1">mvmUSD</span>
+              <span className="ml-1">{selectedToken.symbol}</span>
             </div>
-            <StakePercentageButtons
-              balance={balance}
-              setStakeAmount={setAmount}
-            />
+            <PercentageButtons balance={balance} setAmount={setAmount} disabled={isUnstake} />
           </div>
         </section>
       </div>

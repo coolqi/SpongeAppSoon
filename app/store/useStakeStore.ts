@@ -13,7 +13,7 @@ interface TokenState {
 
   // Available tokens in the application
   supportedTokens: TokenInfo[];
-  
+  supportedUnstakeTokens: TokenInfo[];
   // Currently selected token
   selectedToken: TokenInfo;
   
@@ -46,8 +46,18 @@ const initialSupportedTokens: TokenInfo[] = [
   // }
 ];
 
+const initialUnstakeSupportedTokens: TokenInfo[] = [
+  {
+    symbol: 'stmvmUSD',
+    mint: CASH_MINT.toBase58(),
+    decimals: 6,
+    isNative: false
+  },
+];
+
 const useStakeStore = create<TokenState>((set, get) => ({
   supportedTokens: initialSupportedTokens,
+  supportedUnstakeTokens: initialUnstakeSupportedTokens,
   selectedToken: {} as TokenInfo, // Default to {}
   balance: 0,
   stakedAmount: 0,
@@ -61,6 +71,7 @@ const useStakeStore = create<TokenState>((set, get) => ({
   getTokenMint: (symbol) => {
     switch (symbol) {
       case 'mvmUSD':
+      case 'stmvmUSD':
         return CASH_MINT;
       case 'USD*':
         return USDC_MINT;
