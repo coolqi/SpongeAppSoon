@@ -268,7 +268,6 @@ export const getUserNativeBalance = async (
     }
 
     const balance = await connection.getBalance(userPublicKey);
-    console.log("balance", balance / LAMPORTS_PER_SOL);
     return balance / LAMPORTS_PER_SOL;
   } catch (error) {
     console.error("Error getting user native balance:", error);
@@ -300,15 +299,14 @@ export const getUserSplBalance = async (
       tokenMintPublicKey,
       userPublicKey
     );
-    console.log(tokenAccountPublicKey.toBase58());
+    console.log('tokenAccountPublicKey', tokenAccountPublicKey.toBase58());
 
     try {
-      console.log("GETACCOUNT info");
       const accountInfo = await connection.getParsedAccountInfo(
         tokenAccountPublicKey
       );
       console.dir(accountInfo);
-      const parsedAccountInfo = accountInfo.value?.data;
+      const parsedAccountInfo = accountInfo.value?.data as any;
       if (!parsedAccountInfo) {
         throw new Error("account does not exist.");
       }
@@ -320,20 +318,6 @@ export const getUserSplBalance = async (
   } catch (error) {
     console.error("Error getting user SPL balance:", error);
     return null;
-  }
-};
-
-export const getSplTokenDecimals = async (
-  connection: Connection,
-  mintAddress: string
-): Promise<number> => {
-  try {
-    const mint = await getAccountInfo(new PublicKey(mintAddress));
-    console.log("DECIMAL", mint.decimals);
-    return mint.decimals;
-  } catch (error) {
-    console.error("Error getting token decimals:", error);
-    throw error;
   }
 };
 

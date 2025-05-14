@@ -20,8 +20,10 @@ interface TokenState {
   // User balances
   balance: number;
   stakedAmount: number;
+  isLoading: boolean;
   
   // Actions
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedToken: (token: TokenInfo) => void;
   setBalance: (balance: number) => void;
   setStakedAmount: (amount: number) => void;
@@ -61,6 +63,8 @@ const useTokenStore = create<TokenState>((set, get) => ({
   selectedToken: {} as TokenInfo, // Default to first token
   balance: 0,
   stakedAmount: 0,
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
   
   setSelectedToken: (token) => set({ selectedToken: token }),
   setBalance: (balance) => set({ balance }),

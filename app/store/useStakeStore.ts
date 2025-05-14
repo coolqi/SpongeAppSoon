@@ -20,8 +20,10 @@ interface TokenState {
   // User balances
   balance: number;
   stakedAmount: number;
+  isLoading: boolean;
   
   // Actions
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedToken: (token: TokenInfo) => void;
   setBalance: (balance: number) => void;
   setStakedAmount: (amount: number) => void;
@@ -36,19 +38,21 @@ const initialSupportedTokens: TokenInfo[] = [
     decimals: 6,
     isNative: false
   },
-  {
-    symbol: 'USD*',
-    mint: USDC_MINT.toBase58(),
-    decimals: 6,
-    isNative: false
-  }
+  // {
+  //   symbol: 'USD*',
+  //   mint: USDC_MINT.toBase58(),
+  //   decimals: 6,
+  //   isNative: false
+  // }
 ];
 
 const useStakeStore = create<TokenState>((set, get) => ({
   supportedTokens: initialSupportedTokens,
-  selectedToken: initialSupportedTokens[0], // Default to first token
+  selectedToken: {} as TokenInfo, // Default to {}
   balance: 0,
   stakedAmount: 0,
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
   
   setSelectedToken: (token) => set({ selectedToken: token }),
   setBalance: (balance) => set({ balance }),

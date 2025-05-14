@@ -11,9 +11,8 @@ import {
   useWallet,
 } from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
-import { getPoolDetail, PoolDetailInfo } from "@/lib/getPoolDetails";
-import { Connection, PublicKey } from "@solana/web3.js";
-import { getSolBalance, getTokenBalance } from "@/lib/getBorrowBalance";
+import { PublicKey } from "@solana/web3.js";
+import { getSolBalance } from "@/lib/borrow";
 const tabs = [
   {
     label: "Borrow",
@@ -26,38 +25,22 @@ const tabs = [
 ];
 
 export const DepositTabs = () => {
-  const { connection } = useConnection();
   const [selectedTab, setSelectedTab] = useState("borrow");
   const { connected: _connected, publicKey: walletPublicKey } = useWallet();
-  const wallet = useAnchorWallet();
   const [connected, setConnected] = useState(_connected);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-  const [details, setDetails] = useState<PoolDetailInfo | null>(null);
-  const { selectedToken, setSelectedToken, setBalance } = useTokenStore();
-
-  const fetchDetails = async () => {
-    try {
-      if (!wallet) return;
-      setIsLoadingDetails(true);
-      const poolDetail = await getPoolDetail(
-        wallet,
-        connection,
-        new PublicKey(selectedToken.mint || ""),
-        walletPublicKey || new PublicKey("")
-      );
-      console.log("poolDetail", poolDetail);
-      setDetails(poolDetail);
-    } catch (error) {
-      console.error("Error fetchDetails", error);
-    } finally {
-      setIsLoadingDetails(false);
-    }
-  };
+  const { selectedToken, setSelectedToken, setBalance, setIsLoading } = useTokenStore();
 
   const getBalance = async () => {
     if (!walletPublicKey) return;
-    const sol = await getSolBalance(walletPublicKey);
-    setBalance(sol);
+    setIsLoading(true);
+    try {
+      const sol = await getSolBalance(walletPublicKey);
+      setBalance(sol);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -65,7 +48,6 @@ export const DepositTabs = () => {
   }, [selectedTab]);
 
   useEffect(() => {
-    console.log('selectedToken', selectedToken)
     if (selectedToken.symbol === "SOL" && walletPublicKey) {
       getBalance();
     } else {
@@ -110,21 +92,13 @@ export const DepositTabs = () => {
         <TabsContent value={"borrow"} className="mt-0">
           <BorrowCard
             connected={connected}
-            maxAmount={
-              details?.userAssets?.cashAmount
-                ? Number(details?.userAssets?.cashAmount)
-                : 0
-            }
+            callback={getBalance}
           />
         </TabsContent>
         <TabsContent value={"withdraw"} className="mt-0">
           <WithdrawCard
             connected={connected}
-            maxAmount={
-              details?.userAssets?.lendingReceiptAmount
-                ? Number(details?.userAssets?.lendingReceiptAmount)
-                : 0
-            }
+            callback={getBalance}
           />
         </TabsContent>
       </Tabs>
