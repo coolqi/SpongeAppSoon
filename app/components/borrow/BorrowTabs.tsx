@@ -5,8 +5,15 @@ import { CardContainer } from "../ui/Container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import BorrowCard from "./BorrowCard";
 import WithdrawCard from "./WithdrawCard";
-import { useWallet } from "@solana/wallet-adapter-react";
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
+import { getPoolDetail, PoolDetailInfo } from "@/lib/getPoolDetails";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { getSolBalance, getTokenBalance } from "@/lib/getBorrowBalance";
 const tabs = [
   {
     label: "Borrow",
@@ -19,29 +26,52 @@ const tabs = [
 ];
 
 export const DepositTabs = () => {
+  const { connection } = useConnection();
   const [selectedTab, setSelectedTab] = useState("borrow");
-  const { connected: _connected } = useWallet();
+  const { connected: _connected, publicKey: walletPublicKey } = useWallet();
+  const wallet = useAnchorWallet();
   const [connected, setConnected] = useState(_connected);
-  const { selectedToken, setSelectedToken, supportedTokens } = useTokenStore();
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [details, setDetails] = useState<PoolDetailInfo | null>(null);
+  const { selectedToken, setSelectedToken, setBalance } = useTokenStore();
 
-  const [borrowData, setBorrowData] = useState({
-    tokenSymbol: "SOL",
-    amount: 0.006,
-    currentPrice: 0,
-    estimatedApy: 8,
-  });
+  const fetchDetails = async () => {
+    try {
+      if (!wallet) return;
+      setIsLoadingDetails(true);
+      const poolDetail = await getPoolDetail(
+        wallet,
+        connection,
+        new PublicKey(selectedToken.mint || ""),
+        walletPublicKey || new PublicKey("")
+      );
+      console.log("poolDetail", poolDetail);
+      setDetails(poolDetail);
+    } catch (error) {
+      console.error("Error fetchDetails", error);
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
 
-  const [withdrawData, setWithdrawData] = useState({
-    tokenSymbol: "SOL",
-    amount: 0.006,
-    currentPrice: 0,
-    estimatedApy: 8,
-  });
+  const getBalance = async () => {
+    if (!walletPublicKey) return;
+    const sol = await getSolBalance(walletPublicKey);
+    setBalance(sol);
+  };
+
+  useEffect(() => {
+    setSelectedToken({} as any);
+  }, [selectedTab]);
 
   useEffect(() => {
     console.log('selectedToken', selectedToken)
-
-  }, [selectedToken.symbol]);
+    if (selectedToken.symbol === "SOL" && walletPublicKey) {
+      getBalance();
+    } else {
+      setBalance(0);
+    }
+  }, [selectedToken.symbol, walletPublicKey]);
 
   useEffect(() => {
     const handleConnect = () => {
@@ -59,11 +89,11 @@ export const DepositTabs = () => {
       window?.solana?.off("disconnect", handleDisconnect);
     };
   }, []);
+
   return (
     <CardContainer>
       <Tabs
         value={selectedTab}
-        className=""
         onValueChange={(val) => setSelectedTab(val)}
       >
         <TabsList className="w-auto mb-6 bg-green-dark p-2 rounded-2xl border-4 border-black text-black/60 text-[15px]">
@@ -78,10 +108,24 @@ export const DepositTabs = () => {
           ))}
         </TabsList>
         <TabsContent value={"borrow"} className="mt-0">
-          <BorrowCard connected={connected} data={borrowData} />
+          <BorrowCard
+            connected={connected}
+            maxAmount={
+              details?.userAssets?.cashAmount
+                ? Number(details?.userAssets?.cashAmount)
+                : 0
+            }
+          />
         </TabsContent>
         <TabsContent value={"withdraw"} className="mt-0">
-          <WithdrawCard connected={connected} />
+          <WithdrawCard
+            connected={connected}
+            maxAmount={
+              details?.userAssets?.lendingReceiptAmount
+                ? Number(details?.userAssets?.lendingReceiptAmount)
+                : 0
+            }
+          />
         </TabsContent>
       </Tabs>
     </CardContainer>

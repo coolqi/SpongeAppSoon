@@ -11,9 +11,6 @@ interface TokenDataProps {
   symbol: string;
   amount: number;
   setAmount: (amount: number) => void;
-  value: number;
-  setValue: (amount: number) => void;
-  currentPrice: number;
   balance: number;
   selectedToken: TokenInfo;
   setSelectedToken: (token: TokenInfo) => void;
@@ -25,17 +22,11 @@ export default function TokenData({
   symbol,
   amount,
   setAmount,
-  value,
-  setValue,
-  currentPrice,
   balance,
   selectedToken,
   setSelectedToken,
   supportedTokens,
 }: TokenDataProps) {
-  useEffect(() => {
-    setValue(amount * currentPrice);
-  }, [amount, currentPrice]);
 
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
@@ -102,7 +93,6 @@ export default function TokenData({
             }}
             onChange={(e) => {
               const newAmount = parseFloat(e.target.value);
-              console.log('newAmount', newAmount);
               setAmount(isNaN(newAmount) ? 0 : newAmount);
             }}
             className="text-right text-xl"

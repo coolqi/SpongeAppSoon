@@ -8,7 +8,7 @@ const MemeButton = React.forwardRef<
   <button
     ref={ref}
     className={cn(
-      "rounded-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 px-6 transform hover:scale-105 transition-all shadow-lg border-4 border-black dark:border-yellow-500",
+      "rounded-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 px-6 transform hover:scale-105 transition-all shadow-lg border-4 border-black dark:border-yellow-500 disabled:hover:opacity-90 disabled:hover:scale-100",
       className
     )}
     {...props}
