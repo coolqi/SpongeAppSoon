@@ -53,71 +53,6 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
   } = useTokenStore();
 
   const tokenSymbol = selectedToken.symbol;
-  const currentPrice = selectedToken.decimals;
-
-  // Define fetchBalances as a function to be reused
-  const fetchBalances = async (): Promise<void> => {
-    // Return early if wallet is not connected
-    console.log('fetchBalances called');
-    if (!wallet) {
-      setError("Wallet not connected");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null); // Clear any previous errors
-      // Fetch balance based on token type
-      if (selectedToken.isNative) {
-        // For native token (ETH)
-        const nativeBalance = await getUserNativeBalance(connection, wallet);
-        setBalance(nativeBalance || 0);
-      } else {
-        // For SPL tokens
-        console.log("SPL Token Mint", selectedToken.mint);
-        const splBalance = await getUserSplBalance(
-          connection,
-          wallet,
-          selectedToken.mint
-        );
-        console.log("BALANCE", splBalance);
-        setBalance(splBalance || 0);
-      }
-
-      // Fetch staked amount
-      const tokenMint = getTokenMint(selectedToken.symbol);
-
-      const staked = await getUserSplStaked(
-        connection,
-        wallet,
-        idl as SoonVault,
-        idl.address,
-        new PublicKey(currentNetwork.authorityPublicKey),
-        tokenMint
-      );
-      console.log("tokenMint", tokenMint.toBase58());
-      setStakedAmount(staked || 0);
-    } catch (error) {
-      console.error("Error fetching balances:", error);
-      setError("Failed to fetch balances. Check your network connection.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!wallet) return;
-    console.log("Wallet connected:", selectedToken);
-    fetchBalances();
-  }, [
-    wallet,
-    currentNetwork.rpcUrl,
-    selectedToken,
-    connection,
-    setBalance,
-    setStakedAmount,
-    getTokenMint,
-  ]);
 
   const handleBorrow = async () => {
     if (!wallet || !connection) {
@@ -134,7 +69,12 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
       setLoading(true);
       setError(null);
       console.log('selectedToken', selectedToken)
-      borrow();
+      borrow(
+        wallet,
+        connection,
+        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
+        borrowAmount,
+      );
       // console.log('ssss', Object.keys(SolendSDK));
     } catch (error) {
       console.error("Error withdraw:", error);

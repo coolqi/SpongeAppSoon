@@ -24,7 +24,7 @@ export async function getCashPoolDetail(
   wallet: AnchorWallet,
   connection: Connection,
   poolPk: PublicKey,
-  walletPublicKey: PublicKey  
+  walletPublicKey: PublicKey
 ): Promise<CashPoolDetailInfo> {
   try {
     const provider = new anchor.AnchorProvider(
