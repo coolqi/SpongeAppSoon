@@ -9,7 +9,7 @@ import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
-import { borrow, getMockQuote } from "@/lib/borrow";
+import { borrow, getInputBalance, getMockQuote } from "@/lib/borrow";
 import toast, { Toaster } from "react-hot-toast";
 import { formatAmount } from "@/lib/amount";
 
@@ -46,15 +46,15 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
       setError("Please enter a valid stake amount");
       return;
     }
-
+  
     try {
       setLoading(true);
       setError(null);
-      const res = await borrow(
+      await borrow(
         wallet,
         connection,
         new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
-        borrowAmount
+        getInputBalance(borrowAmount)
       );
       toast.success("Borrow successful!");
       callback?.();

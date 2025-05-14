@@ -1,18 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CardContainer } from "../ui/Container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import BorrowCard from "./BorrowCard";
 import WithdrawCard from "./WithdrawCard";
 import {
   useAnchorWallet,
-  useConnection,
   useWallet,
 } from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
-import { PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { getSolBalance } from "@/lib/borrow";
+import { getPoolDetail } from "@/lib/stake";
+import useNetworkStore from "@/store/useNetworkStore";
+import toast from "react-hot-toast";
+
 const tabs = [
   {
     label: "Borrow",
@@ -25,19 +28,51 @@ const tabs = [
 ];
 
 export const DepositTabs = () => {
+  const wallet = useAnchorWallet();
+  const { currentNetwork } = useNetworkStore();
   const [selectedTab, setSelectedTab] = useState("borrow");
   const { connected: _connected, publicKey: walletPublicKey } = useWallet();
   const [connected, setConnected] = useState(_connected);
-  const { selectedToken, setSelectedToken, setBalance, setIsLoading } = useTokenStore();
+  const { selectedToken, setSelectedToken, setBalance, setIsLoading } =
+    useTokenStore();
+
+  const connection = useMemo(() => {
+    return new Connection(currentNetwork.rpcUrl, "confirmed");
+  }, [currentNetwork.rpcUrl]);
 
   const getBalance = async () => {
     if (!walletPublicKey) return;
     setIsLoading(true);
     try {
-      const sol = await getSolBalance(walletPublicKey);
+      const sol = await getSolBalance(connection, walletPublicKey);
       setBalance(sol);
     } catch (error) {
       console.error("Error fetching balance:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchDetails = async () => {
+    try {
+      if (!wallet) {
+        toast.error('Wallet not connected');
+        return;
+      };
+      setIsLoading(true);
+      const poolDetail = await getPoolDetail(
+        wallet,
+        connection,
+        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
+        walletPublicKey || new PublicKey("")
+      );
+      setBalance(
+        poolDetail?.userAssets?.lendingReceiptAmount
+          ? Number(poolDetail?.userAssets?.lendingReceiptAmount)
+          : 0
+      );
+    } catch (error) {
+      console.error("Error fetchDetails", error);
     } finally {
       setIsLoading(false);
     }
@@ -49,7 +84,11 @@ export const DepositTabs = () => {
 
   useEffect(() => {
     if (selectedToken.symbol === "SOL" && walletPublicKey) {
-      getBalance();
+      if (selectedTab === "withdraw") {
+        fetchDetails();
+      } else {
+        getBalance();
+      }
     } else {
       setBalance(0);
     }
@@ -74,10 +113,7 @@ export const DepositTabs = () => {
 
   return (
     <CardContainer>
-      <Tabs
-        value={selectedTab}
-        onValueChange={(val) => setSelectedTab(val)}
-      >
+      <Tabs value={selectedTab} onValueChange={(val) => setSelectedTab(val)}>
         <TabsList className="w-auto mb-6 bg-green-dark p-2 rounded-2xl border-4 border-black text-black/60 text-[15px]">
           {tabs.map((tab) => (
             <TabsTrigger
@@ -90,16 +126,10 @@ export const DepositTabs = () => {
           ))}
         </TabsList>
         <TabsContent value={"borrow"} className="mt-0">
-          <BorrowCard
-            connected={connected}
-            callback={getBalance}
-          />
+          <BorrowCard connected={connected} callback={getBalance} />
         </TabsContent>
         <TabsContent value={"withdraw"} className="mt-0">
-          <WithdrawCard
-            connected={connected}
-            callback={getBalance}
-          />
+          <WithdrawCard connected={connected} callback={fetchDetails} />
         </TabsContent>
       </Tabs>
     </CardContainer>

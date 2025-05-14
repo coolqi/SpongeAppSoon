@@ -10,13 +10,13 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import { Separator } from "radix-ui";
 import useStakeStore from "@/store/useStakeStore";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { redeemCash } from "@/lib/stake";
 
 export default function UnstakeCard({ callback }: { callback: () => void }) {
   const {
     selectedToken,
-    supportedTokens,
+    supportedUnstakeTokens,
     setSelectedToken,
     balance,
     isLoading,
@@ -80,6 +80,7 @@ export default function UnstakeCard({ callback }: { callback: () => void }) {
           {error}
         </div>
       )}
+      <Toaster position="top-right" />
       <div className="bg-green-dark border-4 border-black p-3 rounded-3xl">
         <TokenData
           isUnstake
@@ -93,7 +94,7 @@ export default function UnstakeCard({ callback }: { callback: () => void }) {
           loading={loading || isLoading}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
-          supportedTokens={supportedTokens}
+          supportedTokens={supportedUnstakeTokens}
         />
       </div>
       <div className="-mt-1 space-y-0">

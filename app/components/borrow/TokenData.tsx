@@ -6,6 +6,7 @@ import { TokenInfo } from "@/store/useTokenStore";
 import { Select, SelectItem } from "../ui/Select";
 import PercentageButtons from "../ui/PercentageButtons";
 import { Spinner } from "../ui/Spinner";
+import { getMockQuote } from "@/lib/borrow";
 
 interface TokenDataProps {
   isBorrow?: boolean;
@@ -52,7 +53,7 @@ export default function TokenData({
       <div className="grid gap-1">
         <section className="flex items-center justify-between">
           <div className="text-xs font-medium">
-            {isBorrow ? "You borrow: " : "You withdraw: "}
+            {isBorrow ? "You supply: " : "You withdraw: "}
           </div>
         </section>
         <section className="flex items-center justify-between gap-2">
@@ -113,11 +114,19 @@ export default function TokenData({
               {loading ? (
                 <Spinner className="h-4 w-4" />
               ) : (
-                <span className="font-bold ml-1">{balance.toFixed(4)}</span>
+                <span className="font-bold ml-1">
+                  {parseFloat(balance.toFixed(4))}
+                </span>
               )}
-              <span className="ml-1">{selectedToken.symbol}</span>
+              <span className="ml-1">
+                {isBorrow ? selectedToken.symbol : ""}
+              </span>
             </div>
-            <PercentageButtons balance={balance} setAmount={setAmount} />
+            <PercentageButtons
+              balance={isBorrow ? getMockQuote(balance) : balance}
+              setAmount={setAmount}
+              disabled={!isBorrow}
+            />
           </div>
         </section>
       </div>

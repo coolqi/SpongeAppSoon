@@ -14,7 +14,7 @@ import {
 import useNetworkStore from "@/store/useNetworkStore";
 import useStakeStore from "@/store/useStakeStore";
 import { lendCash } from "@/lib/lendCash";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function StakeCard({ callback }: { callback: () => void }) {
   const { currentNetwork } = useNetworkStore();
@@ -79,6 +79,7 @@ export default function StakeCard({ callback }: { callback: () => void }) {
 
   return (
     <div className="bg-green-light dark:bg-[#0A0F1C] grid gap-4">
+      <Toaster position="top-right" />
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
