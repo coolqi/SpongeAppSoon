@@ -1,5 +1,7 @@
 'use client';
 
+import { getMockQuote } from "@/lib/borrow";
+
 interface StakePercentageButtonsProps {
   balance: number;
   setAmount: (val: number) => void;
@@ -18,7 +20,7 @@ export default function PercentageButtons({
   }]
   
   const handleSetPercentage = (percentage: number) => {
-    const amount = (balance * percentage) / 100;
+    const amount = (getMockQuote(balance) * percentage) / 100;
     setAmount(amount);
   };
 

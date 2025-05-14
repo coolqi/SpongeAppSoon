@@ -1,5 +1,4 @@
 import { DepositTabs } from "@/components/borrow/BorrowTabs";
-import Script from "next/script";
 
 const DepositPage = () => {
   return (
@@ -11,10 +10,6 @@ const DepositPage = () => {
           </div>
         </main>
       </div>
-      <Script
-        src="https://terminal.jup.ag/main-v1.js"
-        strategy="afterInteractive"
-      />
     </>
   );
 };

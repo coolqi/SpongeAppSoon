@@ -1,36 +1,25 @@
 "use client";
 
 import { MemeButton } from "../ui/MemeButton";
-import {
-  useWallet,
-  useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
-import { useState, useEffect, useMemo } from "react";
-import {
-  getUserNativeBalance,
-  getUserSplBalance,
-  getUserSplStaked,
-} from "@/lib/program";
-import {
-  Connection,
-  PublicKey,
-} from "@solana/web3.js";
+import { useState, useMemo } from "react";
+import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
-import { idl, SoonVault } from "@/program/soon_vault";
 import TokenData from "./TokenData";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
-import { borrow, getMockQuote } from "@/lib/getBorrowBalance";
+import { borrow, getMockQuote } from "@/lib/borrow";
+import toast, { Toaster } from "react-hot-toast";
+import { formatAmount } from "@/lib/amount";
 
 interface BorrowCardProps {
   connected: boolean;
-  maxAmount: number;
+  callback?: () => void;
 }
 
-export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
+export default function BorrowCard({ connected, callback }: BorrowCardProps) {
   const wallet = useAnchorWallet();
-  const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
   const [borrowAmount, setBorrowAmount] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -42,15 +31,8 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
   }, [currentNetwork.rpcUrl]);
 
   // Get token data from store
-  const {
-    selectedToken,
-    supportedTokens,
-    setSelectedToken,
-    balance,
-    setBalance,
-    setStakedAmount,
-    getTokenMint,
-  } = useTokenStore();
+  const { selectedToken, supportedTokens, setSelectedToken, balance, isLoading } =
+    useTokenStore();
 
   const tokenSymbol = selectedToken.symbol;
 
@@ -68,14 +50,15 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
     try {
       setLoading(true);
       setError(null);
-      console.log('selectedToken', selectedToken)
-      borrow(
+      const res = await borrow(
         wallet,
         connection,
-        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
-        borrowAmount,
+        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
+        borrowAmount
       );
-      // console.log('ssss', Object.keys(SolendSDK));
+      toast.success("Borrow successful!");
+      callback?.();
+      setBorrowAmount(0);
     } catch (error) {
       console.error("Error withdraw:", error);
       setError("Failed to borrow. Please try again.");
@@ -86,6 +69,7 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
 
   return (
     <div className="bg-green-light dark:bg-[#0A0F1C] grid gap-4">
+      <Toaster position="top-right" />
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
@@ -98,6 +82,7 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
           amount={borrowAmount}
           setAmount={setBorrowAmount}
           balance={balance}
+          loading={loading || isLoading}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
           supportedTokens={supportedTokens}
@@ -109,7 +94,7 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
             Available colleteral:
           </span>
           <span className="font-bold ml-1">
-            {getMockQuote(balance).toFixed(4)}
+            {formatAmount(parseFloat(getMockQuote(balance).toFixed(4)))}
           </span>
         </div>
       </div>
@@ -124,9 +109,7 @@ export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
         </MemeButton>
       ) : (
         <div className="rounded-full mt-0 w-full bg-yellow-light hover:bg-yellow-dark font-bold">
-          <UnifiedWalletButton
-            buttonClassName="!transform !hover:scale-105 !transition-all !border-4 !border-black !rounded-full !w-full !py-3 !px-6 !text-base !flex !items-center !justify-center !bg-yellow-light"
-          />
+          <UnifiedWalletButton buttonClassName="!transform !hover:scale-105 !transition-all !border-4 !border-black !rounded-full !w-full !py-3 !px-6 !text-base !flex !items-center !justify-center !bg-yellow-light" />
         </div>
       )}
     </div>

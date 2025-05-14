@@ -5,6 +5,7 @@ import Image from "next/image";
 import { TokenInfo } from "@/store/useTokenStore";
 import { Select, SelectItem } from "../ui/Select";
 import PercentageButtons from "../ui/PercentageButtons";
+import { Spinner } from "../ui/Spinner";
 
 interface TokenDataProps {
   isBorrow?: boolean;
@@ -12,6 +13,7 @@ interface TokenDataProps {
   amount: number;
   setAmount: (amount: number) => void;
   balance: number;
+  loading: boolean;
   selectedToken: TokenInfo;
   setSelectedToken: (token: TokenInfo) => void;
   supportedTokens: TokenInfo[];
@@ -23,23 +25,23 @@ export default function TokenData({
   amount,
   setAmount,
   balance,
+  loading,
   selectedToken,
   setSelectedToken,
   supportedTokens,
 }: TokenDataProps) {
-
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
       case "ETH":
         return "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
       case "SOL":
         return "/solana.png";
-      case 'JupSOL':
-        return '/jupsol.png';
-      case 'JitoSOL':
-        return '/jitosol.png';
-      case 'BNSOL':
-        return '/bnsol.png';
+      case "JupSOL":
+        return "/jupsol.png";
+      case "JitoSOL":
+        return "/jitosol.png";
+      case "BNSOL":
+        return "/bnsol.png";
       default:
         return "";
     }
@@ -49,8 +51,9 @@ export default function TokenData({
     <div>
       <div className="grid gap-1">
         <section className="flex items-center justify-between">
-          <div className="text-xs font-medium">{isBorrow ? 'You borrow: ': 'You withdraw: '}</div>
-          <div></div>
+          <div className="text-xs font-medium">
+            {isBorrow ? "You borrow: " : "You withdraw: "}
+          </div>
         </section>
         <section className="flex items-center justify-between gap-2">
           <Select
@@ -73,9 +76,11 @@ export default function TokenData({
                   />
                   <div className="grid gap-0">
                     {token.symbol}
-                    {isBorrow ? <div className="text-xs font-normal text-green-lightest">
-                      8% APY
-                    </div>: null}
+                    {isBorrow ? (
+                      <div className="text-xs font-normal text-green-lightest">
+                        8% APY
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </SelectItem>
@@ -85,6 +90,7 @@ export default function TokenData({
             id="stake-amount"
             type="number"
             value={amount}
+            disabled={!isBorrow || loading}
             onFocus={(e) => {
               if (e.target.value === "0") setAmount("" as unknown as number);
             }}
@@ -99,16 +105,19 @@ export default function TokenData({
           />
         </section>
         <section className="mt-1 flex items-center justify-between text-sm dark:text-gray-400">
-          <p className="font-medium">{isBorrow ? 'Max borrow ': 'Available to withdraw '}:</p>
+          <p className="font-medium">
+            {isBorrow ? "Max borrow " : "Available to withdraw "}:
+          </p>
           <div className="flex items-center justify-end gap-2">
             <div className="flex items-center gap-1">
-              <span className="font-bold ml-1">{balance.toFixed(4)}</span>
+              {loading ? (
+                <Spinner className="h-4 w-4" />
+              ) : (
+                <span className="font-bold ml-1">{balance.toFixed(4)}</span>
+              )}
               <span className="ml-1">{selectedToken.symbol}</span>
             </div>
-            <PercentageButtons
-              balance={balance}
-              setAmount={setAmount}
-            />
+            <PercentageButtons balance={balance} setAmount={setAmount} />
           </div>
         </section>
       </div>

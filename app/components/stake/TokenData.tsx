@@ -5,6 +5,8 @@ import Image from "next/image";
 import { TokenInfo } from "@/store/useTokenStore";
 import { Select, SelectItem } from "../ui/Select";
 import StakePercentageButtons from "./StakePercentageButtons";
+import { Spinner } from "../ui/Spinner";
+import { formatAmount } from "@/lib/amount";
 
 interface TokenDataProps {
   isUnstake?: boolean;
@@ -15,6 +17,7 @@ interface TokenDataProps {
   setValue: (amount: number) => void;
   currentPrice: number;
   balance: number;
+  loading: boolean;
   selectedToken: TokenInfo;
   setSelectedToken: (token: TokenInfo) => void;
   supportedTokens: TokenInfo[];
@@ -22,14 +25,12 @@ interface TokenDataProps {
 
 export default function TokenData({
   isUnstake,
-  symbol,
   amount,
   setAmount,
-  value,
   setValue,
   currentPrice,
   balance,
-  selectedToken,
+  loading,
   setSelectedToken,
   supportedTokens,
 }: TokenDataProps) {
@@ -39,9 +40,9 @@ export default function TokenData({
 
   const getTokenIcon = (symbol: string) => {
     switch (symbol) {
-      case "mvmUSD": 
+      case "mvmUSD":
         return "/cash.png";
-      case "USD*": 
+      case "USD*":
         return "/usd.png";
       default:
         return "";
@@ -52,8 +53,9 @@ export default function TokenData({
     <div>
       <div className="grid gap-1">
         <section className="flex items-center justify-between">
-          <div className="text-xs font-medium">{isUnstake ? 'You unstake: ': 'You stake: '}</div>
-          <div></div>
+          <div className="text-xs font-medium">
+            {isUnstake ? "You unstake: " : "You stake: "}
+          </div>
         </section>
         <section className="flex items-center justify-between gap-2">
           <Select
@@ -82,6 +84,7 @@ export default function TokenData({
             id="stake-amount"
             type="number"
             value={amount}
+            disabled={isUnstake || loading}
             onFocus={(e) => {
               if (e.target.value === "0") setAmount("" as unknown as number);
             }}
@@ -99,7 +102,14 @@ export default function TokenData({
           <p className="font-medium">Wallet:</p>
           <div className="flex items-center justify-end gap-2">
             <div className="flex items-center gap-1">
-              <span className="font-bold ml-1">{balance.toFixed(4)}</span>
+              {loading ? (
+                <Spinner className="h-4 w-4" />
+              ) : (
+                <span className="font-bold ml-1">
+                  {formatAmount(parseFloat(balance.toFixed(4)))}
+                </span>
+              )}
+
               <span className="ml-1">mvmUSD</span>
             </div>
             <StakePercentageButtons

@@ -9,24 +9,26 @@ import { Separator } from "radix-ui";
 import { useState, useEffect, useMemo } from "react";
 import {
   Connection,
+  PublicKey,
 } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
+import { getMockQuote, redeem } from "@/lib/borrow";
 
 interface WithdrawCardProps {
   connected: boolean;
-  maxAmount: number;
+  callback?: () => void;
 }
 
-export default function WithdrawCard({ connected, maxAmount }: WithdrawCardProps) {
+export default function WithdrawCard({ connected, callback }: WithdrawCardProps) {
   const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
   const wallet = useAnchorWallet();
-  const [withdrawAmount, setWithdrawAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [withdrawAmount, setWithdrawAmount] = useState(0);
 
   // Create connection using useMemo to prevent recreation on every render
   const connection = useMemo(() => {
@@ -39,26 +41,14 @@ export default function WithdrawCard({ connected, maxAmount }: WithdrawCardProps
     supportedTokens,
     setSelectedToken,
     balance,
-    setBalance,
-    setStakedAmount,
-    getTokenMint,
+    isLoading,
   } = useTokenStore();
 
   const tokenSymbol = selectedToken.symbol;
-  const currentPrice = selectedToken.decimals;
 
   useEffect(() => {
-    if (!wallet) return;
-
-  }, [
-    wallet,
-    currentNetwork.rpcUrl,
-    selectedToken,
-    connection,
-    setBalance,
-    setStakedAmount,
-    getTokenMint,
-  ]);
+    setWithdrawAmount(getMockQuote(balance));
+  }, [balance]);
 
   const handleWithdraw = async () => {
     if (!wallet || !connection) {
@@ -74,7 +64,12 @@ export default function WithdrawCard({ connected, maxAmount }: WithdrawCardProps
     try {
       setLoading(true);
       setError(null);
-      // fetchBalances();
+      await redeem( // withdraw
+        wallet,
+        connection,
+        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
+      );
+      callback?.();
     } catch (error) {
       console.error("Error withdraw:", error);
       setError("Failed to withdraw. Please try again.");
@@ -96,6 +91,7 @@ export default function WithdrawCard({ connected, maxAmount }: WithdrawCardProps
           amount={withdrawAmount}
           setAmount={setWithdrawAmount}
           balance={balance}
+          loading={loading || isLoading}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
           supportedTokens={supportedTokens}
@@ -106,7 +102,7 @@ export default function WithdrawCard({ connected, maxAmount }: WithdrawCardProps
         <MemeButton
           className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
           onClick={handleWithdraw}
-          disabled={loading || withdrawAmount <= 0}
+          disabled={loading || withdrawAmount <= 0 || !selectedToken.symbol}
         >
           {loading ? "Processing..." : "Withdraw"}
         </MemeButton>
