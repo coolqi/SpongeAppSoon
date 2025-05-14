@@ -58,7 +58,7 @@ const initialSupportedTokens: TokenInfo[] = [
 
 const useTokenStore = create<TokenState>((set, get) => ({
   supportedTokens: initialSupportedTokens,
-  selectedToken: initialSupportedTokens[0], // Default to first token
+  selectedToken: {} as TokenInfo, // Default to first token
   balance: 0,
   stakedAmount: 0,
   

@@ -4,12 +4,10 @@ import { MemeButton } from "../ui/MemeButton";
 import {
   useWallet,
   useAnchorWallet,
-  AnchorWallet,
 } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
 import { useState, useEffect, useMemo } from "react";
 import {
-  stakeSpl,
   getUserNativeBalance,
   getUserSplBalance,
   getUserSplStaked,
@@ -17,30 +15,24 @@ import {
 import {
   Connection,
   PublicKey,
-  sendAndConfirmTransaction,
-  SystemProgram,
 } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import { idl, SoonVault } from "@/program/soon_vault";
-import { token } from "@coral-xyz/anchor/dist/cjs/utils";
-import { Transaction } from "@solana/web3.js";
-import { stakeNative } from "@/lib/program";
 import TokenData from "./TokenData";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
+import { borrow, getMockQuote } from "@/lib/getBorrowBalance";
 
 interface BorrowCardProps {
-  data: any;
   connected: boolean;
+  maxAmount: number;
 }
 
-export default function BorrowCard({ data, connected }: BorrowCardProps) {
-  console.log('BorrowCard data', data);
+export default function BorrowCard({ connected, maxAmount }: BorrowCardProps) {
   const wallet = useAnchorWallet();
   const { sendTransaction } = useWallet();
   const { currentNetwork } = useNetworkStore();
-  const [stakeAmount, setStakeAmount] = useState(0);
-  const [stakeValue, setStakeValue] = useState(0);
+  const [borrowAmount, setBorrowAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +47,6 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
     supportedTokens,
     setSelectedToken,
     balance,
-    stakedAmount,
     setBalance,
     setStakedAmount,
     getTokenMint,
@@ -134,7 +125,7 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
       return;
     }
 
-    if (!stakeAmount || stakeAmount <= 0) {
+    if (!borrowAmount || borrowAmount <= 0) {
       setError("Please enter a valid stake amount");
       return;
     }
@@ -143,6 +134,8 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
       setLoading(true);
       setError(null);
       console.log('selectedToken', selectedToken)
+      borrow();
+      // console.log('ssss', Object.keys(SolendSDK));
     } catch (error) {
       console.error("Error withdraw:", error);
       setError("Failed to borrow. Please try again.");
@@ -162,11 +155,8 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
         <TokenData
           isBorrow
           symbol={tokenSymbol}
-          amount={stakeAmount}
-          setAmount={setStakeAmount}
-          value={stakeValue}
-          setValue={setStakeValue}
-          currentPrice={currentPrice}
+          amount={borrowAmount}
+          setAmount={setBorrowAmount}
           balance={balance}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
@@ -179,9 +169,7 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
             Available colleteral:
           </span>
           <span className="font-bold ml-1">
-            --
-            {/* {(stakedAmount / Math.pow(10, selectedToken.decimals)).toFixed(4)}{" "}
-              {selectedToken.symbol} */}
+            {getMockQuote(balance).toFixed(4)}
           </span>
         </div>
       </div>
@@ -190,7 +178,7 @@ export default function BorrowCard({ data, connected }: BorrowCardProps) {
         <MemeButton
           className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
           onClick={handleBorrow}
-          disabled={loading || stakeAmount <= 0}
+          disabled={loading || borrowAmount <= 0}
         >
           {loading ? "Processing..." : "Borrow"}
         </MemeButton>
