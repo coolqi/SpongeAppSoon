@@ -2,9 +2,7 @@
 
 import { MemeButton } from "../ui/MemeButton";
 import TokenData from "./TokenData";
-import {
-  useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { useState, useEffect, useMemo } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
@@ -54,10 +52,11 @@ export default function UnstakeCard({ callback }: { callback: () => void }) {
         setError("Please enter a valid amount");
         return;
       }
-      await redeemCash( // unstake
+      await redeemCash(
+        // unstake
         wallet,
         connection,
-        new PublicKey('3y53jbCNMgjbVLFDnw1KkD6TRnoXidaSo6KubxtR2HV1'),
+        new PublicKey("3y53jbCNMgjbVLFDnw1KkD6TRnoXidaSo6KubxtR2HV1"),
         unstakeAmount,
       );
       toast.success("Unstake successful!");
@@ -66,7 +65,7 @@ export default function UnstakeCard({ callback }: { callback: () => void }) {
     } catch (error) {
       console.error("Error unstaking:", error);
       setError(
-        error instanceof Error ? error.message : "Failed to unstake tokens"
+        error instanceof Error ? error.message : "Failed to unstake tokens",
       );
     } finally {
       setLoading(false);
@@ -101,25 +100,17 @@ export default function UnstakeCard({ callback }: { callback: () => void }) {
         <div className="flex justify-between items-center text-gray-dark/70 font-medium">
           <span className=" dark:text-gray-400">Supply</span>
           <span className=" dark:text-gray-400">20M</span>
-          </div>
+        </div>
         <div className="flex justify-between items-center text-gray-dark/70 font-medium">
-          <span className="dark:text-gray-400">
-            Current Price
-          </span>
-          <span className="font-bold ml-1">
-            1 mvmUSD = 1 USD
-          </span>
+          <span className="dark:text-gray-400">Current Price</span>
+          <span className="font-bold ml-1">1 mvmUSD = 1 USD</span>
         </div>
       </div>
       <Separator.Root className="bg-green-dark w-full h-1" />
       <MemeButton
         className="w-full bg-yellow-light hover:bg-yellow-dark border-black"
         onClick={handleUnstake}
-        disabled={
-          loading ||
-          unstakeAmount <= 0 ||
-          unstakeAmount > balance
-        }
+        disabled={loading || unstakeAmount <= 0 || unstakeAmount > balance}
       >
         {loading ? "Processing..." : "Unstake"}
       </MemeButton>

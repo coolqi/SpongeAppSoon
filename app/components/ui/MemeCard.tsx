@@ -1,5 +1,5 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 const MemeCard = React.forwardRef<
   HTMLDivElement,
@@ -9,12 +9,12 @@ const MemeCard = React.forwardRef<
     ref={ref}
     className={cn(
       "rounded-3xl border-4 border-yellow-400 bg-white shadow-lg transform hover:scale-105 transition-all dark:bg-[#1A1F2E] p-4",
-      className
+      className,
     )}
     {...props}
   />
-))
-MemeCard.displayName = "MemeCard"
+));
+MemeCard.displayName = "MemeCard";
 
 const MemeCardHeader = React.forwardRef<
   HTMLDivElement,
@@ -25,8 +25,8 @@ const MemeCardHeader = React.forwardRef<
     className={cn("flex items-center space-x-2 p-2", className)}
     {...props}
   />
-))
-MemeCardHeader.displayName = "MemeCardHeader"
+));
+MemeCardHeader.displayName = "MemeCardHeader";
 
 const MemeCardEmoji = React.forwardRef<
   HTMLSpanElement,
@@ -37,19 +37,15 @@ const MemeCardEmoji = React.forwardRef<
     className={cn("text-2xl animate-bounce", className)}
     {...props}
   />
-))
-MemeCardEmoji.displayName = "MemeCardEmoji"
+));
+MemeCardEmoji.displayName = "MemeCardEmoji";
 
 const MemeCardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("p-4 text-center", className)}
-    {...props}
-  />
-))
-MemeCardContent.displayName = "MemeCardContent"
+  <div ref={ref} className={cn("p-4 text-center", className)} {...props} />
+));
+MemeCardContent.displayName = "MemeCardContent";
 
-export { MemeCard, MemeCardHeader, MemeCardEmoji, MemeCardContent }
+export { MemeCard, MemeCardHeader, MemeCardEmoji, MemeCardContent };

@@ -6,8 +6,8 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**',
+        protocol: "https",
+        hostname: "**",
       },
     ],
   },
@@ -19,7 +19,7 @@ const nextConfig = {
     return config;
   },
   // Add output configuration for static exports
-  output: 'standalone',
-}
+  output: "standalone",
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

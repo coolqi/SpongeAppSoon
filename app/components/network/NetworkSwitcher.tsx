@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import useNetworkStore from '@/store/useNetworkStore';
-import { useClickOutside } from '@/hooks/useClickOutside';
-import { NetworkButton } from './NetworkButton';
-import { NetworkList } from './NetworkList';
-import { cn } from '@/lib/utils';
+import { useState, useRef } from "react";
+import useNetworkStore from "@/store/useNetworkStore";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { NetworkButton } from "./NetworkButton";
+import { NetworkList } from "./NetworkList";
+import { cn } from "@/lib/utils";
 
 export function NetworkSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
-  const { networks, currentNetwork, setNetwork } = useNetworkStore();
+  const { networks, currentNetwork, setCurrentNetwork } = useNetworkStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useClickOutside(dropdownRef, () => setIsOpen(false));
@@ -22,12 +22,12 @@ export function NetworkSwitcher() {
   return (
     <div className="relative" ref={dropdownRef}>
       <NetworkButton
-        network={currentNetwork}
+        network={currentNetwork as any}
         onClick={() => setIsOpen(!isOpen)}
         showChevron
         className={cn(
           "bg-yellow-100 dark:bg-[#1A1F2E] rounded-xl border-2 border-yellow-300 dark:border-yellow-600",
-          "hover:bg-yellow-200 dark:hover:bg-[#242B3D]"
+          "hover:bg-yellow-200 dark:hover:bg-[#242B3D]",
         )}
       />
 
@@ -35,9 +35,9 @@ export function NetworkSwitcher() {
         <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-[#1A1F2E] rounded-xl border-2 border-yellow-300 dark:border-yellow-600 shadow-lg z-50 overflow-hidden">
           <NetworkList
             networks={networks}
-            selectedNetwork={currentNetwork}
+            selectedNetwork={currentNetwork as any}
             onNetworkSelect={(network) => {
-              setNetwork(network.id);
+              setCurrentNetwork(network.id);
               setIsOpen(false);
             }}
           />

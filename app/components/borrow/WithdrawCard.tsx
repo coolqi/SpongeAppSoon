@@ -1,15 +1,10 @@
 "use client";
 
 import { MemeButton } from "../ui/MemeButton";
-import {
-  useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
 import { useState, useEffect, useMemo } from "react";
-import {
-  Connection,
-  PublicKey,
-} from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
@@ -22,7 +17,10 @@ interface WithdrawCardProps {
   callback?: () => void;
 }
 
-export default function WithdrawCard({ connected, callback }: WithdrawCardProps) {
+export default function WithdrawCard({
+  connected,
+  callback,
+}: WithdrawCardProps) {
   const { currentNetwork } = useNetworkStore();
   const wallet = useAnchorWallet();
   const [loading, setLoading] = useState(false);
@@ -63,10 +61,11 @@ export default function WithdrawCard({ connected, callback }: WithdrawCardProps)
     try {
       setLoading(true);
       setError(null);
-      await redeem( // withdraw
+      await redeem(
+        // withdraw
         wallet,
         connection,
-        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
+        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
       );
       callback?.();
       toast.success("Withdraw successful!");

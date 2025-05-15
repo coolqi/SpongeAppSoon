@@ -38,7 +38,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       name,
       value,
       defaultValue,
-      placeholder = 'Select',
+      placeholder = "Select",
       readOnly,
       disabled,
       required,
@@ -53,7 +53,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       onValueChange,
       ...restProps
     },
-    ref
+    ref,
   ) => {
     if (hidden) {
       return null;
@@ -74,12 +74,15 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           ref={ref}
           className={cn(
             "group flex items-center justify-between relative h-[45px] w-full rounded shadow-inner-green bg-green-light px-3.5 text-left text-black outline-none transition-colors duration-150 ease-linear focus-within:border-blue focus-within:shadow-field disabled:cursor-not-allowed disabled:bg-grey-hover disabled:text-grey-dark data-[state=open]:bg-grey-light data-[placeholder]:text-grey-dark data-[placeholder]:font-xl data-[placeholder]:font-medium disabled:data-[placeholder]:text-grey-tertiary",
-            className
+            className,
           )}
           data-name={name}
           {...restProps}
         >
-          <SelectValue placeholder={placeholder} className="font-semibold text-xl" />
+          <SelectValue
+            placeholder={placeholder}
+            className="font-semibold text-xl"
+          />
           <SelectIcon>
             <ChevronDownIcon className="w-4 absolute right-2 top-1/2 -translate-y-1/2 transition-transform group-data-[state=open]:rotate-180" />
           </SelectIcon>
@@ -91,14 +94,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           collisionPadding={10}
           className={cn(
             "z-[500] max-h-[--radix-select-content-available-height] w-[--radix-select-trigger-width] min-w-[140px] overflow-y-auto rounded-md bg-green-light border-green-lighter border-2",
-            dropdownClassName
+            dropdownClassName,
           )}
         >
           <SelectViewport>{children}</SelectViewport>
         </SelectContent>
       </SelectRoot>
     );
-  }
+  },
 );
 
 export type SelectItemProps = SelectPrimitives.SelectItemProps & {
@@ -117,7 +120,7 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
       hideIndicator,
       ...restProps
     },
-    ref
+    ref,
   ) => {
     if (hidden) {
       return null;
@@ -131,14 +134,14 @@ export const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(
         disabled={disabled}
         className={cn(
           "p-0 bg-green-light border-b-2 last-of-type:border-none border-green-lighter hover:bg-green-dark active:bg-green-dark relative cursor-pointer py-1.5 pl-4 transition-colors duration-150 ease-linear data-[disabled]:cursor-not-allowed data-[disabled]:bg-transparent data-[highlighted]:bg-grey-light data-[disabled]:text-grey-mid",
-          className
+          className,
         )}
         {...restProps}
       >
         <SelectItemText>{children}</SelectItemText>
       </SelectPrimitives.Item>
     );
-  }
+  },
 );
 
 Select.displayName = "Select";

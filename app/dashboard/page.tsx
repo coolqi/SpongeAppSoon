@@ -14,7 +14,9 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-[#0A0F1C] rounded-xl p-6 border-4 border-yellow-400 dark:border-yellow-600">
               <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
               <div className="space-y-4">
-                <p className="text-gray-600 dark:text-gray-400">Connect wallet to view activity 🔌</p>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Connect wallet to view activity 🔌
+                </p>
               </div>
             </div>
           </div>

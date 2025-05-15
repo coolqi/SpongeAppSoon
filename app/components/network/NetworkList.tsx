@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Network } from '@/store/useNetworkStore';
-import { NetworkButton } from './NetworkButton';
+import { Network } from "@/store/useNetworkStore";
+import { NetworkButton } from "./NetworkButton";
 
 interface NetworkListProps {
   networks: Network[];
@@ -9,7 +9,11 @@ interface NetworkListProps {
   onNetworkSelect: (network: Network) => void;
 }
 
-export function NetworkList({ networks, selectedNetwork, onNetworkSelect }: NetworkListProps) {
+export function NetworkList({
+  networks,
+  selectedNetwork,
+  onNetworkSelect,
+}: NetworkListProps) {
   return (
     <div className="w-full">
       {networks.map((network) => (

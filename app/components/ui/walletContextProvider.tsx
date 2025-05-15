@@ -18,7 +18,7 @@ const WalletContextProvider: React.FC<{ children: ReactNode }> = (props: {
     const fetchEthPrice = async () => {
       try {
         const response = await axios.get(
-          'https://api3.binance.com/api/v3/ticker/price?symbols=["ETHUSDC"]'
+          'https://api3.binance.com/api/v3/ticker/price?symbols=["ETHUSDC"]',
         );
         setEthPrice(parseFloat(response.data[0].price));
       } catch (error) {
@@ -74,9 +74,10 @@ const WalletContextProvider: React.FC<{ children: ReactNode }> = (props: {
                 </div>
               )} */}
               <NetworkSwitcher />
-              <UnifiedWalletButton 
-              currentUserClassName="!z-20 !text-sm !bg-[url('/launch.png')] !bg-cover !w-[157px] !h-[55px] !font-sm !flex !items-center !justify-center"
-              buttonClassName="!z-20 !text-sm !bg-[url('/launch.png')] !bg-cover !w-[157px] !h-[55px] !font-sm !flex !items-center !justify-center" />
+              <UnifiedWalletButton
+                currentUserClassName="!z-20 !text-sm !bg-[url('/launch.png')] !bg-cover !w-[157px] !h-[55px] !font-sm !flex !items-center !justify-center"
+                buttonClassName="!z-20 !text-sm !bg-[url('/launch.png')] !bg-cover !w-[157px] !h-[55px] !font-sm !flex !items-center !justify-center"
+              />
             </div>
           </div>
           {props.children}

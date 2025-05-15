@@ -15,7 +15,7 @@ import { Spinner } from "./components/ui/Spinner";
 
 const WalletContextProvider = dynamic(
   () => import("./components/ui/walletContextProvider"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const SimpleSnackbar = dynamic(() => import("./components/ui/SimpleSnackbar"), {

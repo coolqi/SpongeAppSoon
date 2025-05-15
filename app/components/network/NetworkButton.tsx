@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { NetworkIcon } from './NetworkIcon';
-import { cn } from '@/lib/utils';
-import { Network } from '@/store/useNetworkStore';
+import { NetworkIcon } from "./NetworkIcon";
+import { cn } from "@/lib/utils";
+import { Network } from "@/store/useNetworkStore";
 
 interface NetworkButtonProps {
   network: Network;
@@ -12,12 +12,12 @@ interface NetworkButtonProps {
   className?: string;
 }
 
-export function NetworkButton({ 
-  network, 
-  isSelected, 
-  onClick, 
+export function NetworkButton({
+  network,
+  isSelected,
+  onClick,
   showChevron,
-  className 
+  className,
 }: NetworkButtonProps) {
   return (
     <button
@@ -25,7 +25,7 @@ export function NetworkButton({
       className={cn(
         "flex items-center space-x-3 px-4 py-2 hover:bg-yellow-100 dark:hover:bg-[#242B3D] transition-colors",
         isSelected && "bg-yellow-200 dark:bg-[#242B3D]",
-        className
+        className,
       )}
     >
       <NetworkIcon src={network.icon} alt={network.name} />
@@ -37,7 +37,12 @@ export function NetworkButton({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       )}
     </button>

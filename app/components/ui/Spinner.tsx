@@ -1,7 +1,10 @@
-import { forwardRef } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
-export type SpinnerProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+export type SpinnerProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "children"
+>;
 
 export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
   ({ hidden, className, ...restProps }, ref) => {
@@ -14,8 +17,8 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
         ref={ref}
         data-cy="spinner"
         aria-hidden="true"
-        className={twMerge(
-          'inline-block h-[1em] w-[1em] animate-spin select-none rounded-full border-2 border-solid border-current border-b-transparent border-l-transparent outline-none duration-500 ease-linear repeat-infinite',
+        className={cn(
+          "inline-block h-[1em] w-[1em] animate-spin select-none rounded-full border-2 border-solid border-current border-b-transparent border-l-transparent outline-none duration-500 ease-linear repeat-infinite",
           className,
         )}
         {...restProps}
@@ -24,4 +27,4 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
   },
 );
 
-Spinner.displayName = 'Spinner';
+Spinner.displayName = "Spinner";

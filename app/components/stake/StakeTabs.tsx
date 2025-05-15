@@ -35,7 +35,7 @@ export default function StakeTabs() {
         wallet,
         connection,
         new PublicKey("3y53jbCNMgjbVLFDnw1KkD6TRnoXidaSo6KubxtR2HV1"),
-        walletPublicKey || new PublicKey("")
+        walletPublicKey || new PublicKey(""),
       );
       console.log("cash", poolDetail);
       const totalCanStake = poolDetail?.userAssets?.cashAmount;

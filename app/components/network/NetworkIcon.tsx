@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface NetworkIconProps {
   src: string;
@@ -10,7 +10,12 @@ interface NetworkIconProps {
   className?: string;
 }
 
-export function NetworkIcon({ src, alt, size = 20, className }: NetworkIconProps) {
+export function NetworkIcon({
+  src,
+  alt,
+  size = 20,
+  className,
+}: NetworkIconProps) {
   return (
     <Image
       src={src}

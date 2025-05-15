@@ -1,6 +1,12 @@
-import { create } from 'zustand';
-import { PublicKey } from '@solana/web3.js';
-import { SOL_MINT, ETH_MINT, JITOSOL_MINT, JUPSOL_MINT, BNSOL_MINT } from '@/core/setting';
+import { create } from "zustand";
+import { PublicKey } from "@solana/web3.js";
+import {
+  SOL_MINT,
+  ETH_MINT,
+  JITOSOL_MINT,
+  JUPSOL_MINT,
+  BNSOL_MINT,
+} from "@/core/setting";
 
 export interface TokenInfo {
   symbol: string;
@@ -10,18 +16,17 @@ export interface TokenInfo {
 }
 
 interface TokenState {
-
   // Available tokens in the application
   supportedTokens: TokenInfo[];
-  
+
   // Currently selected token
   selectedToken: TokenInfo;
-  
+
   // User balances
   balance: number;
   stakedAmount: number;
   isLoading: boolean;
-  
+
   // Actions
   setIsLoading: (isLoading: boolean) => void;
   setSelectedToken: (token: TokenInfo) => void;
@@ -33,29 +38,29 @@ interface TokenState {
 // Define initial supported tokens
 const initialSupportedTokens: TokenInfo[] = [
   {
-    symbol: 'SOL',
+    symbol: "SOL",
     mint: SOL_MINT.toBase58(),
     decimals: 6,
-    isNative: false
+    isNative: false,
   },
   {
-    symbol: 'JitoSOL',
+    symbol: "JitoSOL",
     mint: JITOSOL_MINT.toBase58(),
     decimals: 6,
-    isNative: false
+    isNative: false,
   },
   {
-    symbol: 'JupSOL',
+    symbol: "JupSOL",
     mint: JUPSOL_MINT.toBase58(),
     decimals: 6,
-    isNative: false
+    isNative: false,
   },
   {
-    symbol: 'BNSOL',
+    symbol: "BNSOL",
     mint: BNSOL_MINT.toBase58(),
     decimals: 6,
-    isNative: false
-  }
+    isNative: false,
+  },
 ];
 
 const useTokenStore = create<TokenState>((set, get) => ({
@@ -65,28 +70,30 @@ const useTokenStore = create<TokenState>((set, get) => ({
   stakedAmount: 0,
   isLoading: false,
   setIsLoading: (isLoading) => set({ isLoading }),
-  
+
   setSelectedToken: (token) => set({ selectedToken: token }),
   setBalance: (balance) => set({ balance }),
   setStakedAmount: (stakedAmount) => set({ stakedAmount }),
-  
+
   getTokenMint: (symbol) => {
     switch (symbol) {
-      case 'SOL':
+      case "SOL":
         return SOL_MINT;
-      case 'ETH':
+      case "ETH":
         return ETH_MINT;
-      case 'JitoSOL':
+      case "JitoSOL":
         return JITOSOL_MINT;
-      case 'JupSOL':
+      case "JupSOL":
         return JUPSOL_MINT;
-      case 'BNSOL':
+      case "BNSOL":
         return BNSOL_MINT;
       default:
-        const tokenInfo = get().supportedTokens.find(t => t.symbol === symbol);
+        const tokenInfo = get().supportedTokens.find(
+          (t) => t.symbol === symbol,
+        );
         return tokenInfo ? new PublicKey(tokenInfo.mint) : SOL_MINT;
     }
-  }
+  },
 }));
 
-export default useTokenStore; 
+export default useTokenStore;

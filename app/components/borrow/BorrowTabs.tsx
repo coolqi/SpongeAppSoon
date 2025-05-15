@@ -5,10 +5,7 @@ import { CardContainer } from "../ui/Container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import BorrowCard from "./BorrowCard";
 import WithdrawCard from "./WithdrawCard";
-import {
-  useAnchorWallet,
-  useWallet,
-} from "@solana/wallet-adapter-react";
+import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { getSolBalance } from "@/lib/borrow";
@@ -56,20 +53,20 @@ export const DepositTabs = () => {
   const fetchDetails = async () => {
     try {
       if (!wallet) {
-        toast.error('Wallet not connected');
+        toast.error("Wallet not connected");
         return;
-      };
+      }
       setIsLoading(true);
       const poolDetail = await getPoolDetail(
         wallet,
         connection,
         new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
-        walletPublicKey || new PublicKey("")
+        walletPublicKey || new PublicKey(""),
       );
       setBalance(
         poolDetail?.userAssets?.lendingReceiptAmount
           ? Number(poolDetail?.userAssets?.lendingReceiptAmount)
-          : 0
+          : 0,
       );
     } catch (error) {
       console.error("Error fetchDetails", error);

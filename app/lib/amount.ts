@@ -4,7 +4,7 @@
  * @param input - Input raw money number
  * @returns Formatted money in AUD currency
  */
-export const currencyFormatter = Intl.NumberFormat('en-AU', {
+export const currencyFormatter = Intl.NumberFormat("en-AU", {
   minimumFractionDigits: 0,
   maximumFractionDigits: 4,
 });

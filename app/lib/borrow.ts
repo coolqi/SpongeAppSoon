@@ -1,12 +1,19 @@
-import * as anchor from '@coral-xyz/anchor';
+import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
-import { Idl } from '@coral-xyz/anchor';
-import fallIdl from './cash.json';
-import BN from 'bn.js';
-import { AUTHORITY_SEED, LENDING_TOKEN_SEED, CASH_TOKEN_SEED } from './constants';
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from '@solana/spl-token';
+import { Idl } from "@coral-xyz/anchor";
+import fallIdl from "./cash.json";
+import BN from "bn.js";
+import {
+  AUTHORITY_SEED,
+  LENDING_TOKEN_SEED,
+  CASH_TOKEN_SEED,
+} from "./constants";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "./splToken";
 
-export const getSolBalance = async (connection: Connection, walletPublicKey: PublicKey) => {
+export const getSolBalance = async (
+  connection: Connection,
+  walletPublicKey: PublicKey,
+) => {
   if (!walletPublicKey) return 0;
 
   const lamports = await connection.getBalance(walletPublicKey);
@@ -22,87 +29,72 @@ export const getMockQuote = (amountSOL: number) => {
 
 export const getInputBalance = (balance: number) => {
   return balance / Math.pow(10, 9);
-}
+};
 
 export const borrow = async (
   wallet: any,
   connection: Connection,
   poolPda: PublicKey,
-  borrowAmount: number
+  borrowAmount: number,
 ) => {
   try {
-    const provider = new anchor.AnchorProvider(
-      connection,
-      wallet,
-      { preflightCommitment: "confirmed" }
-    );
+    const provider = new anchor.AnchorProvider(connection, wallet, {
+      preflightCommitment: "confirmed",
+    });
 
-    const program = new anchor.Program(
-      (fallIdl as any) as Idl,
-      provider
-    ) as any;
+    const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     const mintA = pool.mintA;
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
+      program.programId,
     );
 
     const poolAccountA = getAssociatedTokenAddressSync(
       mintA,
       poolAuthority,
-      true
+      true,
     );
 
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(LENDING_TOKEN_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
+      program.programId,
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(CASH_TOKEN_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(CASH_TOKEN_SEED)],
+      program.programId,
     );
 
     const lenderTokenA = await anchor.utils.token.associatedAddress({
       mint: mintA,
-      owner: provider.wallet.publicKey
+      owner: provider.wallet.publicKey,
     });
 
     const [lenderAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
         provider.wallet.publicKey.toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
+        Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId
+      program.programId,
     );
 
     const lenderLendReceiptToken = await anchor.utils.token.associatedAddress({
-      mint:lendingReceiptTokenMint,
-      owner:lenderAuthority,
+      mint: lendingReceiptTokenMint,
+      owner: lenderAuthority,
     });
-    
+
     const lenderCashToken = await anchor.utils.token.associatedAddress({
       mint: cashTokenMint,
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods.lend(new BN(borrowAmount)).accounts({
+    const tx = await program.methods
+      .lend(new BN(borrowAmount))
+      .accounts({
         pool: poolPda,
         poolAuthority: poolAuthority,
         poolAccountA: poolAccountA,
@@ -117,7 +109,8 @@ export const borrow = async (
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).rpc();
+      })
+      .rpc();
 
     return {
       tx,
@@ -128,19 +121,19 @@ export const borrow = async (
         lenderTokenA,
         lenderLendReceiptToken,
         lenderCashToken,
-      }
+      },
     };
   } catch (error) {
-    console.error('Error in lend:', error);
+    console.error("Error in lend:", error);
     if (error instanceof Error) {
-      console.error('Error details:', {
+      console.error("Error details:", {
         message: error.message,
         stack: error.stack,
       });
     }
     throw error;
-  }  
-}
+  }
+};
 
 export async function redeem(
   wallet: any,
@@ -148,78 +141,63 @@ export async function redeem(
   poolPda: PublicKey,
 ) {
   try {
-    const provider = new anchor.AnchorProvider(
-      connection,
-      wallet,
-      { preflightCommitment: "confirmed" }
-    );
+    const provider = new anchor.AnchorProvider(connection, wallet, {
+      preflightCommitment: "confirmed",
+    });
 
-    const program = new anchor.Program(
-      (fallIdl as any) as Idl,
-      provider
-    ) as any;
+    const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
     const mintA = pool.mintA;
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
+      program.programId,
     );
 
     const poolAccountA = getAssociatedTokenAddressSync(
       mintA,
       poolAuthority,
-      true
+      true,
     );
 
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(LENDING_TOKEN_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
+      program.programId,
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        mintA.toBuffer(),
-        Buffer.from(CASH_TOKEN_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(CASH_TOKEN_SEED)],
+      program.programId,
     );
 
     const lenderTokenA = await anchor.utils.token.associatedAddress({
       mint: mintA,
-      owner: provider.wallet.publicKey
+      owner: provider.wallet.publicKey,
     });
 
     const [lenderAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPda.toBuffer(),
         provider.wallet.publicKey.toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
+        Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId
+      program.programId,
     );
 
     const lenderLendReceiptToken = await anchor.utils.token.associatedAddress({
       mint: lendingReceiptTokenMint,
       owner: lenderAuthority,
     });
-    
+
     const lenderCashToken = await anchor.utils.token.associatedAddress({
       mint: cashTokenMint,
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods.redeem().accounts({
+    const tx = await program.methods
+      .redeem()
+      .accounts({
         pool: poolPda,
         poolAuthority: poolAuthority,
         mintA: mintA,
@@ -235,7 +213,8 @@ export async function redeem(
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).rpc();
+      })
+      .rpc();
 
     return {
       tx,
@@ -246,12 +225,12 @@ export async function redeem(
         lenderTokenA,
         lenderLendReceiptToken,
         lenderCashToken,
-      }
+      },
     };
   } catch (error) {
-    console.error('Error in redeem:', error);
+    console.error("Error in redeem:", error);
     if (error instanceof Error) {
-      console.error('Error details:', {
+      console.error("Error details:", {
         message: error.message,
         stack: error.stack,
       });

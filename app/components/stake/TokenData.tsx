@@ -113,7 +113,11 @@ export default function TokenData({
               )}
               <span className="ml-1">{selectedToken.symbol}</span>
             </div>
-            <PercentageButtons balance={balance} setAmount={setAmount} disabled={isUnstake} />
+            <PercentageButtons
+              balance={balance}
+              setAmount={setAmount}
+              disabled={isUnstake}
+            />
           </div>
         </section>
       </div>
