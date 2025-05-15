@@ -8,11 +8,7 @@ import {
   LENDING_TOKEN_SEED,
   CASH_TOKEN_SEED,
 } from "./constants";
-import {
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "./splToken";
 
 export const getSolBalance = async (
   connection: Connection,

@@ -1,9 +1,4 @@
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  getAccount,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+
 import {
   AUTHORITY_SEED,
   LENDING_TOKEN_SEED,
@@ -16,6 +11,7 @@ import fallIdl from "./cash.json";
 import { CASH_TOKEN_SEED } from "./constants";
 import { BN, Idl } from "@coral-xyz/anchor";
 import { AnchorWallet } from "@solana/wallet-adapter-react";
+import { ASSOCIATED_TOKEN_PROGRAM_ID, getAccount, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "./splToken";
 
 export interface PoolStatusInfo {
   createPool1: boolean;
@@ -159,7 +155,7 @@ async function getUserTokenAmount(
   tokenMint: PublicKey,
 ): Promise<number> {
   try {
-    const userToken = await getAssociatedTokenAddress(
+    const userToken = await getAssociatedTokenAddressSync(
       tokenMint,
       walletPublicKey,
       true,

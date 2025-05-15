@@ -29,7 +29,7 @@ export default function Navbar() {
           alt="menu"
           width={18}
           height={16}
-          className="mr-2"
+          className="mr-2 w-auto h-auto"
         />
       </div>
 

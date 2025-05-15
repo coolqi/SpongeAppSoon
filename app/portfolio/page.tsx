@@ -44,13 +44,13 @@ export default function PortfolioPage() {
 
   useEffect(() => {
     const fetchStakingInfo = async () => {
-      if (!wallet) return;
+      if (!wallet || !currentNetwork) return;
 
       try {
         const connection = new Connection(currentNetwork.rpcUrl, "confirmed");
         const userStatePDA = PublicKey.findProgramAddressSync(
           [Buffer.from("user_state"), wallet.publicKey.toBuffer()],
-          new PublicKey(currentNetwork.contractAddress),
+          new PublicKey((currentNetwork as any).contractAddress),
         )[0];
 
         const accountInfo = await connection.getAccountInfo(userStatePDA);

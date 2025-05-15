@@ -59,7 +59,7 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
         wallet,
         connection,
         new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
-        getInputBalance(borrowAmount),
+        borrowAmount,
       );
       toast.success("Borrow successful!");
       callback?.();
