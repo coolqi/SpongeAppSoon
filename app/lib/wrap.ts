@@ -5,14 +5,13 @@ import {
   SystemProgram,
   sendAndConfirmTransaction,
   Keypair,
-  LAMPORTS_PER_SOL,
   TransactionInstruction,
 } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
   NATIVE_MINT,
   ASSOCIATED_TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+} from "./splToken";
 
 /**
  * Gets the instructions needed to wrap SOL to Wrapped SOL
