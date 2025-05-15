@@ -4,7 +4,7 @@ import { Inter, Nanum_Pen_Script } from "next/font/google";
 import Navbar from "./components/Navbar";
 import { ThemeProvider } from "./components/ThemeProvider";
 import dynamic from "next/dynamic";
-import { twMerge } from "tailwind-merge";
+import { cn } from "./lib/utils";
 
 const Providers = dynamic(() => import("./providers"), { ssr: false });
 
@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={twMerge(inter.className, nanum.variable)}>
+      <body className={cn(inter.className, nanum.variable)}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
