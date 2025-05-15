@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { devnet, mainnet } from '@/config/networks';
-import { idl } from '@/program/soon_vault';
+import { devnet, mainnet } from "@/config/networks";
+import { idl } from "@/program/soon_vault";
 
 export interface Network {
   id: string;
@@ -28,12 +28,13 @@ const NETWORKS: Network[] = [
     name: "SOON Testnet",
     // Original RPC URL (not used directly in browser)
     // rpcUrl: "https://detailed-sharleen-fast-devnet.helius-rpc.com",
-    rpcUrl: "https://greatest-tiniest-mansion.solana-devnet.quiknode.pro/a65e3540c3a32f0f22ed654ea1df784f0a471f51",
+    rpcUrl:
+      "https://greatest-tiniest-mansion.solana-devnet.quiknode.pro/a65e3540c3a32f0f22ed654ea1df784f0a471f51",
     contractAddress: "9PCuUZGyahj9Akup3qJVrKVVpfhjeNnVnkbrdtJ1RcXm",
     authorityPublicKey: "5Z4M4kobAYCJ39QFSwP3AXacgngoqE18tYC1Ew32Vqgm",
     idl: idl,
-    icon: "/soon.png"
-  }
+    icon: "/soon.png",
+  },
 ];
 
 const useNetworkStore = create<NetworkState>((set) => ({
@@ -44,7 +45,7 @@ const useNetworkStore = create<NetworkState>((set) => ({
     authorityPublicKey: NETWORKS[0].authorityPublicKey,
   },
   setCurrentNetwork: (networkId) => {
-    const network = NETWORKS.find(n => n.id === networkId) || NETWORKS[0];
+    const network = NETWORKS.find((n) => n.id === networkId) || NETWORKS[0];
     set(() => ({
       currentNetwork: {
         name: network.name,

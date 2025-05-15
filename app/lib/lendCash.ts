@@ -1,10 +1,13 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import fallIdl from './cash.json';
-import BN from 'bn.js';
-import { Idl } from '@coral-xyz/anchor';
-import { AUTHORITY_SEED, CASH_TOKEN_SEED, SCASH_TOKEN_SEED } from './constants';
+import * as anchor from "@coral-xyz/anchor";
+import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
+import {
+  TOKEN_PROGRAM_ID,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+import fallIdl from "./cash.json";
+import BN from "bn.js";
+import { Idl } from "@coral-xyz/anchor";
+import { AUTHORITY_SEED, CASH_TOKEN_SEED, SCASH_TOKEN_SEED } from "./constants";
 
 export async function lendCash(
   wallet: any,
@@ -13,43 +16,34 @@ export async function lendCash(
   amount: number | BN,
 ) {
   try {
-    const provider = new anchor.AnchorProvider(
-      connection,
-      wallet,
-      { preflightCommitment: "confirmed" }
-    );
+    const provider = new anchor.AnchorProvider(connection, wallet, {
+      preflightCommitment: "confirmed",
+    });
 
-    const program = new anchor.Program(
-      (fallIdl as any) as Idl,
-      provider
-    ) as any;
+    const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
 
     const pool = await program.account.pool.fetch(poolPda);
-    
+
     const [poolAuthority] = PublicKey.findProgramAddressSync(
-      [
-        pool.amm.toBuffer(),
-        pool.mintA.toBuffer(),
-        Buffer.from(AUTHORITY_SEED)
-      ],
-      program.programId
+      [pool.amm.toBuffer(), pool.mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
+      program.programId,
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
       [
         pool.amm.toBuffer(),
         pool.mintA.toBuffer(),
-        Buffer.from(CASH_TOKEN_SEED)
+        Buffer.from(CASH_TOKEN_SEED),
       ],
-      program.programId
+      program.programId,
     );
     const [sCashTokenMint] = PublicKey.findProgramAddressSync(
       [
         pool.amm.toBuffer(),
         pool.mintA.toBuffer(),
-        Buffer.from(SCASH_TOKEN_SEED)
+        Buffer.from(SCASH_TOKEN_SEED),
       ],
-      program.programId
+      program.programId,
     );
 
     const poolAccountCash = await anchor.utils.token.associatedAddress({
@@ -65,7 +59,9 @@ export async function lendCash(
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods.lendCash(new BN(amount)).accounts({
+    const tx = await program.methods
+      .lendCash(new BN(amount))
+      .accounts({
         mintA: pool.mintA,
         cashPool: poolPda,
         poolAuthority: poolAuthority,
@@ -79,7 +75,8 @@ export async function lendCash(
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-      }).rpc();
+      })
+      .rpc();
 
     return {
       tx,
@@ -87,12 +84,12 @@ export async function lendCash(
         poolAuthority,
         cashTokenMint,
         lenderCashToken,
-      }
+      },
     };
   } catch (error) {
-    console.error('Error in lendCash:', error);
+    console.error("Error in lendCash:", error);
     if (error instanceof Error) {
-      console.error('Error details:', {
+      console.error("Error details:", {
         message: error.message,
         stack: error.stack,
       });

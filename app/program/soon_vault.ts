@@ -47,7 +47,7 @@ export type SoonVault = {
                   116,
                   97,
                   116,
-                  101
+                  101,
                 ];
               },
               {
@@ -57,7 +57,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "authority";
-              }
+              },
             ];
           };
         },
@@ -77,7 +77,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "splMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -113,7 +113,7 @@ export type SoonVault = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -132,13 +132,13 @@ export type SoonVault = {
         {
           name: "associatedTokenProgram";
           address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-        }
+        },
       ];
       args: [
         {
           name: "pointRate";
           type: "u8";
-        }
+        },
       ];
     },
     {
@@ -174,7 +174,7 @@ export type SoonVault = {
                   116,
                   97,
                   116,
-                  101
+                  101,
                 ];
               },
               {
@@ -184,7 +184,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "authority";
-              }
+              },
             ];
           };
         },
@@ -204,7 +204,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "splMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -240,7 +240,7 @@ export type SoonVault = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -266,7 +266,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "user";
-              }
+              },
             ];
           };
         },
@@ -286,7 +286,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "splMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -322,7 +322,7 @@ export type SoonVault = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -341,13 +341,13 @@ export type SoonVault = {
         {
           name: "associatedTokenProgram";
           address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-        }
+        },
       ];
       args: [
         {
           name: "amount";
           type: "u64";
-        }
+        },
       ];
     },
     {
@@ -383,7 +383,7 @@ export type SoonVault = {
                   116,
                   97,
                   116,
-                  101
+                  101,
                 ];
               },
               {
@@ -393,7 +393,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "authority";
-              }
+              },
             ];
           };
         },
@@ -413,7 +413,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "splMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -449,7 +449,7 @@ export type SoonVault = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -475,7 +475,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "user";
-              }
+              },
             ];
           };
         },
@@ -495,7 +495,7 @@ export type SoonVault = {
               {
                 kind: "account";
                 path: "splMint";
-              }
+              },
             ];
             program: {
               kind: "const";
@@ -531,7 +531,7 @@ export type SoonVault = {
                 219,
                 233,
                 248,
-                89
+                89,
               ];
             };
           };
@@ -550,15 +550,15 @@ export type SoonVault = {
         {
           name: "associatedTokenProgram";
           address: "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-        }
+        },
       ];
       args: [
         {
           name: "amount";
           type: "u64";
-        }
+        },
       ];
-    }
+    },
   ];
   accounts: [
     {
@@ -568,7 +568,7 @@ export type SoonVault = {
     {
       name: "userV2State";
       discriminator: [99, 6, 71, 8, 33, 103, 86, 224];
-    }
+    },
   ];
   errors: [
     {
@@ -590,7 +590,7 @@ export type SoonVault = {
       code: 6003;
       name: "overflow";
       msg: "Overflow.";
-    }
+    },
   ];
   types: [
     {
@@ -617,7 +617,7 @@ export type SoonVault = {
           {
             name: "pointRate";
             type: "u8";
-          }
+          },
         ];
       };
     },
@@ -641,10 +641,10 @@ export type SoonVault = {
           {
             name: "splPoints";
             type: "u64";
-          }
+          },
         ];
       };
-    }
+    },
   ];
 };
 

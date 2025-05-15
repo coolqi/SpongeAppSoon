@@ -11,7 +11,7 @@ export default function Navbar() {
     // { icon: "🔄", label: "Swap", href: "/swap" },
     { icon: "🌉", label: "Bridge", href: "/bridge" },
     { icon: "🔄", label: "Swap", href: "https://cobaltx.io/swap/" },
-    { icon: '', label: 'Borrow', href: '/'},
+    { icon: "", label: "Borrow", href: "/" },
     { icon: "🏦", label: "Stake", href: "/stake", disabled: false },
     // { icon: "📊", label: "Portfolio", href: "/portfolio" },
     // { icon: "🎁", label: "Referral", href: "/referral" },

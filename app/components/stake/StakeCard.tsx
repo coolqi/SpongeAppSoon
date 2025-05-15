@@ -2,15 +2,10 @@
 
 import { MemeButton } from "../ui/MemeButton";
 import TokenData from "./TokenData";
-import {
-  useAnchorWallet,
-} from "@solana/wallet-adapter-react";
+import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
 import { useState, useMemo } from "react";
-import {
-  Connection,
-  PublicKey,
-} from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useStakeStore from "@/store/useStakeStore";
 import { lendCash } from "@/lib/lendCash";
@@ -63,7 +58,7 @@ export default function StakeCard({ callback }: { callback: () => void }) {
         wallet,
         connection,
         new PublicKey("3y53jbCNMgjbVLFDnw1KkD6TRnoXidaSo6KubxtR2HV1"),
-        stakeAmount
+        stakeAmount,
       );
 
       toast.success("Stake successful!");

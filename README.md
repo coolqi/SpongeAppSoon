@@ -14,11 +14,13 @@ This is a Next.js project that serves as a template for building web application
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/your-repo-name.git
    ```
 
 2. Navigate to the project directory:
+
    ```bash
    cd your-repo-name
    ```
@@ -33,4 +35,4 @@ This is a Next.js project that serves as a template for building web application
 ### Running the Development Server
 
 To start the development server, run:
-```npm run dev```
+`npm run dev`

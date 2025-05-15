@@ -11,9 +11,9 @@ const Providers = dynamic(() => import("./providers"), { ssr: false });
 const inter = Inter({ subsets: ["latin"] });
 
 const nanum = Nanum_Pen_Script({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-nanum',
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-nanum",
 });
 
 export const metadata: Metadata = {
@@ -32,12 +32,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={twMerge(inter.className, nanum.variable)}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
           <Providers>
             <Navbar />
-              <div className="h-full flex-1">
-                {children}
-              </div>
+            <div className="h-full flex-1">{children}</div>
           </Providers>
         </ThemeProvider>
       </body>

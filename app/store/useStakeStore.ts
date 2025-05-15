@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { PublicKey } from '@solana/web3.js';
-import { CASH_MINT, USDC_MINT } from '@/core/setting';
+import { create } from "zustand";
+import { PublicKey } from "@solana/web3.js";
+import { CASH_MINT, USDC_MINT } from "@/core/setting";
 
 export interface TokenInfo {
   symbol: string;
@@ -10,18 +10,17 @@ export interface TokenInfo {
 }
 
 interface TokenState {
-
   // Available tokens in the application
   supportedTokens: TokenInfo[];
   supportedUnstakeTokens: TokenInfo[];
   // Currently selected token
   selectedToken: TokenInfo;
-  
+
   // User balances
   balance: number;
   stakedAmount: number;
   isLoading: boolean;
-  
+
   // Actions
   setIsLoading: (isLoading: boolean) => void;
   setSelectedToken: (token: TokenInfo) => void;
@@ -33,10 +32,10 @@ interface TokenState {
 // Define initial supported tokens
 const initialSupportedTokens: TokenInfo[] = [
   {
-    symbol: 'mvmUSD',
+    symbol: "mvmUSD",
     mint: CASH_MINT.toBase58(),
     decimals: 6,
-    isNative: false
+    isNative: false,
   },
   // {
   //   symbol: 'USD*',
@@ -48,10 +47,10 @@ const initialSupportedTokens: TokenInfo[] = [
 
 const initialUnstakeSupportedTokens: TokenInfo[] = [
   {
-    symbol: 'stmvmUSD',
+    symbol: "stmvmUSD",
     mint: CASH_MINT.toBase58(),
     decimals: 6,
-    isNative: false
+    isNative: false,
   },
 ];
 
@@ -63,23 +62,25 @@ const useStakeStore = create<TokenState>((set, get) => ({
   stakedAmount: 0,
   isLoading: false,
   setIsLoading: (isLoading) => set({ isLoading }),
-  
+
   setSelectedToken: (token) => set({ selectedToken: token }),
   setBalance: (balance) => set({ balance }),
   setStakedAmount: (stakedAmount) => set({ stakedAmount }),
-  
+
   getTokenMint: (symbol) => {
     switch (symbol) {
-      case 'mvmUSD':
-      case 'stmvmUSD':
+      case "mvmUSD":
+      case "stmvmUSD":
         return CASH_MINT;
-      case 'USD*':
+      case "USD*":
         return USDC_MINT;
       default:
-        const tokenInfo = get().supportedTokens.find(t => t.symbol === symbol);
+        const tokenInfo = get().supportedTokens.find(
+          (t) => t.symbol === symbol,
+        );
         return tokenInfo ? new PublicKey(tokenInfo.mint) : CASH_MINT;
     }
-  }
+  },
 }));
 
-export default useStakeStore; 
+export default useStakeStore;

@@ -36,7 +36,7 @@ export async function getPoolDetail(
   wallet: AnchorWallet,
   connection: Connection,
   poolPk: PublicKey,
-  walletPublicKey: PublicKey
+  walletPublicKey: PublicKey,
 ): Promise<PoolDetailInfo> {
   try {
     const provider = new anchor.AnchorProvider(connection, wallet, {
@@ -61,19 +61,19 @@ export async function getPoolDetail(
         provider.wallet.publicKey.toBuffer(),
         Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId
+      program.programId,
     );
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
-      program.programId
+      program.programId,
     );
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
-      program.programId
+      program.programId,
     );
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(CASH_TOKEN_SEED)],
-      program.programId
+      program.programId,
     );
     const [sCashTokenMint] = PublicKey.findProgramAddressSync(
       [
@@ -81,7 +81,7 @@ export async function getPoolDetail(
         pool.mintA.toBuffer(),
         Buffer.from(SCASH_TOKEN_SEED),
       ],
-      program.programId
+      program.programId,
     );
     const [
       createPool1,
@@ -93,10 +93,10 @@ export async function getPoolDetail(
     ] = await Promise.all([
       accountExists(connection, poolPk).catch(() => false),
       getUserTokenAmount(connection, walletPublicKey, sCashTokenMint).catch(
-        () => 0
+        () => 0,
       ),
       getUserTokenAmount(connection, walletPublicKey, cashTokenMint).catch(
-        () => 0
+        () => 0,
       ),
       // getUserTokenAmount(connection, poolAuthority, cashTokenMint).catch(() => 0),
       getUserTokenAmount(connection, poolAuthority, pool.mintA).catch(() => 0),
@@ -104,7 +104,7 @@ export async function getPoolDetail(
       getUserTokenAmount(
         connection,
         lenderAuthority,
-        lendingReceiptTokenMint
+        lendingReceiptTokenMint,
       ).catch(() => 0),
     ]);
     return {
@@ -147,7 +147,7 @@ export async function getPoolDetail(
         tokenAAmount: "0",
         lendingReceiptAmount: "0",
         cashAmount: "0",
-        userSCashAmount: '0'
+        userSCashAmount: "0",
       },
     };
   }
@@ -156,13 +156,13 @@ export async function getPoolDetail(
 async function getUserTokenAmount(
   connection: Connection,
   walletPublicKey: PublicKey,
-  tokenMint: PublicKey
+  tokenMint: PublicKey,
 ): Promise<number> {
   try {
     const userToken = await getAssociatedTokenAddress(
       tokenMint,
       walletPublicKey,
-      true
+      true,
     );
     const userTokenAccount = await getAccount(connection as any, userToken);
     return Number(userTokenAccount.amount);
@@ -174,7 +174,7 @@ async function getUserTokenAmount(
 
 async function accountExists(
   connection: Connection,
-  publicKey: PublicKey
+  publicKey: PublicKey,
 ): Promise<boolean> {
   const account = await connection.getAccountInfo(publicKey);
   return account !== null;
@@ -184,7 +184,7 @@ export async function redeemCash(
   wallet: any,
   connection: Connection,
   poolPda: PublicKey,
-  amount: number
+  amount: number,
 ) {
   try {
     const provider = new anchor.AnchorProvider(connection, wallet, {
@@ -201,7 +201,7 @@ export async function redeemCash(
         cashPool.mintA.toBuffer(),
         Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId
+      program.programId,
     );
     const [sCashTokenMint] = PublicKey.findProgramAddressSync(
       [
@@ -209,7 +209,7 @@ export async function redeemCash(
         cashPool.mintA.toBuffer(),
         Buffer.from(SCASH_TOKEN_SEED),
       ],
-      program.programId
+      program.programId,
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
@@ -218,7 +218,7 @@ export async function redeemCash(
         cashPool.mintA.toBuffer(),
         Buffer.from(CASH_TOKEN_SEED),
       ],
-      program.programId
+      program.programId,
     );
 
     const poolAccountCash = await anchor.utils.token.associatedAddress({

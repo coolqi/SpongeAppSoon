@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 interface PercentageButtonsProps {
   balance: number;
@@ -6,20 +6,22 @@ interface PercentageButtonsProps {
   disabled?: boolean;
 }
 
-export default function PercentageButtons({ 
-  balance, 
+export default function PercentageButtons({
+  balance,
   setAmount,
   disabled,
 }: PercentageButtonsProps) {
-  
-  const percentages = [{
-    value: 50,
-    label: 'Half',
-  }, {
-    value: 100,
-    label: 'Max',
-  }]
-  
+  const percentages = [
+    {
+      value: 50,
+      label: "Half",
+    },
+    {
+      value: 100,
+      label: "Max",
+    },
+  ];
+
   const handleSetPercentage = (percentage: number) => {
     const amount = (balance * percentage) / 100;
     setAmount(amount);

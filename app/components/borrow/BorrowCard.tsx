@@ -31,8 +31,13 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
   }, [currentNetwork.rpcUrl]);
 
   // Get token data from store
-  const { selectedToken, supportedTokens, setSelectedToken, balance, isLoading } =
-    useTokenStore();
+  const {
+    selectedToken,
+    supportedTokens,
+    setSelectedToken,
+    balance,
+    isLoading,
+  } = useTokenStore();
 
   const tokenSymbol = selectedToken.symbol;
 
@@ -46,7 +51,7 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
       setError("Please enter a valid stake amount");
       return;
     }
-  
+
     try {
       setLoading(true);
       setError(null);
@@ -54,7 +59,7 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
         wallet,
         connection,
         new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
-        getInputBalance(borrowAmount)
+        getInputBalance(borrowAmount),
       );
       toast.success("Borrow successful!");
       callback?.();

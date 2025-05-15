@@ -5,8 +5,6 @@ import {
   LAMPORTS_PER_SOL,
   Connection,
   Transaction,
-  SystemProgram,
-  SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from "@solana/web3.js";
 
@@ -15,9 +13,7 @@ import { SoonVault } from "@/program/soon_vault";
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  NATIVE_MINT,
 } from "@solana/spl-token";
-import * as token from "@solana/spl-token";
 import { getWrapSolInstructions, getUnwrapSolInstructions } from "./wrap";
 import { ETH_MINT } from "@/core/setting";
 
@@ -25,7 +21,7 @@ import { ETH_MINT } from "@/core/setting";
  * Program ID for the Soon Vault progra
  */
 export const SOON_VAULT_PROGRAM_ID = new PublicKey(
-  "9PCuUZGyahj9Akup3qJVrKVVpfhjeNnVnkbrdtJ1RcXm"
+  "9PCuUZGyahj9Akup3qJVrKVVpfhjeNnVnkbrdtJ1RcXm",
 );
 
 /**
@@ -39,7 +35,7 @@ export const getProgram = (
   wallet: AnchorWallet,
   idl: SoonVault,
   contractAddress: string,
-  authority: PublicKey
+  authority: PublicKey,
 ) => {
   const provider = new AnchorProvider(connection, wallet, {
     commitment: "confirmed",
@@ -56,34 +52,34 @@ export const getVault = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ) => {
   const { program } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority
+    authority,
   );
 
   const [splVaultStatePDA] = PublicKey.findProgramAddressSync(
     [SPL_VAULT_STATE_SEED, splMint.toBytes(), authority.toBytes()],
-    program.programId
+    program.programId,
   );
 
   const [splVaultATA] = PublicKey.findProgramAddressSync(
     [splVaultStatePDA.toBytes(), TOKEN_PROGRAM_ID.toBytes(), splMint.toBytes()],
-    ASSOCIATED_TOKEN_PROGRAM_ID
+    ASSOCIATED_TOKEN_PROGRAM_ID,
   );
 
   const [userStatePDA] = PublicKey.findProgramAddressSync(
     [USER_STATE_SEED, splMint.toBytes(), wallet.publicKey.toBytes()],
-    program.programId
+    program.programId,
   );
 
   const [userSplATA] = PublicKey.findProgramAddressSync(
     [wallet.publicKey.toBytes(), TOKEN_PROGRAM_ID.toBytes(), splMint.toBytes()],
-    ASSOCIATED_TOKEN_PROGRAM_ID
+    ASSOCIATED_TOKEN_PROGRAM_ID,
   );
 
   return { splVaultStatePDA, splVaultATA, userStatePDA, userSplATA };
@@ -96,14 +92,14 @@ export const getStakeSplInstructions = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<TransactionInstruction> => {
   const { program } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority
+    authority,
   );
 
   return await program.methods
@@ -124,14 +120,14 @@ export const getUnstakeSplInstructions = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<TransactionInstruction> => {
   const { program } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority
+    authority,
   );
 
   return await program.methods
@@ -152,7 +148,7 @@ export const stakeSpl = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<Transaction> => {
   const legalAmount = Math.floor(amount);
   const instruction = await getStakeSplInstructions(
@@ -162,7 +158,7 @@ export const stakeSpl = async (
     idl,
     contractAddress,
     authority,
-    splMint
+    splMint,
   );
   return new Transaction().add(instruction);
 };
@@ -174,7 +170,7 @@ export const unstakeSpl = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<Transaction> => {
   const instruction = await getUnstakeSplInstructions(
     connection,
@@ -183,7 +179,7 @@ export const unstakeSpl = async (
     idl,
     contractAddress,
     authority,
-    splMint
+    splMint,
   );
   return new Transaction().add(instruction);
 };
@@ -195,7 +191,7 @@ export const stake = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<Transaction> => {
   const instruction = await getStakeSplInstructions(
     connection,
@@ -204,7 +200,7 @@ export const stake = async (
     idl,
     contractAddress,
     authority,
-    splMint
+    splMint,
   );
   return new Transaction().add(instruction);
 };
@@ -215,7 +211,7 @@ export const getUserSplStaked = async (
   idl: SoonVault,
   contractAddress: string,
   authority: PublicKey,
-  splMint: PublicKey
+  splMint: PublicKey,
 ): Promise<number | null> => {
   try {
     const { program } = getProgram(
@@ -223,7 +219,7 @@ export const getUserSplStaked = async (
       wallet,
       idl,
       contractAddress,
-      authority
+      authority,
     );
 
     const { userStatePDA } = await getVault(
@@ -232,7 +228,7 @@ export const getUserSplStaked = async (
       idl,
       contractAddress,
       authority,
-      splMint
+      splMint,
     );
 
     const userPublicKey = wallet.publicKey;
@@ -242,9 +238,8 @@ export const getUserSplStaked = async (
     }
 
     try {
-      const fetchedUserState = await program.account.userV2State.fetch(
-        userStatePDA
-      );
+      const fetchedUserState =
+        await program.account.userV2State.fetch(userStatePDA);
       return fetchedUserState.splStakeAmount.toNumber();
     } catch (error) {
       console.error("Error fetching user state:", error);
@@ -258,7 +253,7 @@ export const getUserSplStaked = async (
 
 export const getUserNativeBalance = async (
   connection: Connection,
-  wallet: AnchorWallet
+  wallet: AnchorWallet,
 ): Promise<number | null> => {
   try {
     const userPublicKey = wallet.publicKey;
@@ -278,7 +273,7 @@ export const getUserNativeBalance = async (
 export const getUserSplBalance = async (
   connection: Connection,
   wallet: AnchorWallet,
-  tokenMintAddress: string
+  tokenMintAddress: string,
 ): Promise<number | null> => {
   try {
     if (!wallet || !wallet.publicKey) {
@@ -297,13 +292,13 @@ export const getUserSplBalance = async (
     const userPublicKey = wallet.publicKey;
     const tokenAccountPublicKey = await getAssociatedTokenAddress(
       tokenMintPublicKey,
-      userPublicKey
+      userPublicKey,
     );
-    console.log('tokenAccountPublicKey', tokenAccountPublicKey.toBase58());
+    console.log("tokenAccountPublicKey", tokenAccountPublicKey.toBase58());
 
     try {
       const accountInfo = await connection.getParsedAccountInfo(
-        tokenAccountPublicKey
+        tokenAccountPublicKey,
       );
       console.dir(accountInfo);
       const parsedAccountInfo = accountInfo.value?.data as any;
@@ -327,19 +322,19 @@ export const getStakeNativeInstructions = async (
   amount: number,
   idl: SoonVault,
   contractAddress: string,
-  authority: PublicKey
+  authority: PublicKey,
 ): Promise<TransactionInstruction[]> => {
   const { program } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority
+    authority,
   );
 
   const wrapInstructions = await getWrapSolInstructions(
     wallet.publicKey,
-    amount
+    amount,
   );
 
   const stakeInstruction = await program.methods
@@ -361,14 +356,14 @@ export const getUnstakeNativeInstructions = async (
   amount: number,
   idl: SoonVault,
   contractAddress: string,
-  authority: PublicKey
+  authority: PublicKey,
 ): Promise<TransactionInstruction[]> => {
   const { program } = getProgram(
     connection,
     wallet,
     idl,
     contractAddress,
-    authority
+    authority,
   );
 
   const unstakeInstruction = await program.methods
@@ -381,9 +376,7 @@ export const getUnstakeNativeInstructions = async (
     })
     .instruction();
 
-  const unwrapInstructions = await getUnwrapSolInstructions(
-    wallet.publicKey,
-  );
+  const unwrapInstructions = await getUnwrapSolInstructions(wallet.publicKey);
 
   return [unstakeInstruction, ...unwrapInstructions];
 };
@@ -394,7 +387,7 @@ export const stakeNative = async (
   amount: number,
   idl: SoonVault,
   contractAddress: string,
-  authority: PublicKey
+  authority: PublicKey,
 ): Promise<Transaction> => {
   const legalAmount = Math.floor(amount);
   const instructions = await getStakeNativeInstructions(
@@ -403,7 +396,7 @@ export const stakeNative = async (
     legalAmount,
     idl,
     contractAddress,
-    authority
+    authority,
   );
   return new Transaction().add(...instructions);
 };
@@ -414,7 +407,7 @@ export const unstakeNative = async (
   amount: number,
   idl: SoonVault,
   contractAddress: string,
-  authority: PublicKey
+  authority: PublicKey,
 ): Promise<Transaction> => {
   const instructions = await getUnstakeNativeInstructions(
     connection,
@@ -422,7 +415,7 @@ export const unstakeNative = async (
     amount,
     idl,
     contractAddress,
-    authority
+    authority,
   );
   return new Transaction().add(...instructions);
 };
