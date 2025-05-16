@@ -13,7 +13,10 @@ export const CASH_MINT = new PublicKey(
   "CaSH9YwRnbLb9ynSBrFuzuh5KbYzQ3MyWp4hJMPGMznp",
 );
 export const USDC_MINT = new PublicKey(
-  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'
+);
+export const USDT_MINT = new PublicKey(
+  "Q6XprfkF8RQQKoQVG33xT88H7wi8Uk1B1CC7YAs69Gi",
 );
 
 export const JITOSOL_MINT = new PublicKey(
@@ -25,3 +28,5 @@ export const JUPSOL_MINT = new PublicKey(
 export const BNSOL_MINT = new PublicKey(
   "BNSQL1nq3v2k5Z7x8z9g6J4v5Q6f8f6sZdosWBjx93v",
 );
+
+export const MVM_USD_MINT = new PublicKey('CvTmuRzD3WNTC74GsNTYPiHAqyuy23W2rFhWr7NHGAcs');

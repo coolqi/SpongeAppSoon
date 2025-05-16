@@ -11,7 +11,8 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import { getSolBalance } from "@/lib/borrow";
 import { getPoolDetail } from "@/lib/stake";
 import useNetworkStore from "@/store/useNetworkStore";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
+import { USDC_MINT } from "@/core/setting";
 
 const tabs = [
   {
@@ -26,10 +27,9 @@ const tabs = [
 
 export const DepositTabs = () => {
   const wallet = useAnchorWallet();
-  const { currentNetwork } = useNetworkStore();
+  const { currentNetwork, connected } = useNetworkStore();
   const [selectedTab, setSelectedTab] = useState("borrow");
-  const { connected: _connected, publicKey: walletPublicKey } = useWallet();
-  const [connected, setConnected] = useState(_connected);
+  const { publicKey: walletPublicKey } = useWallet();
   const { selectedToken, setSelectedToken, setBalance, setIsLoading } =
     useTokenStore();
 
@@ -60,13 +60,14 @@ export const DepositTabs = () => {
       const poolDetail = await getPoolDetail(
         wallet,
         connection,
-        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
-        walletPublicKey || new PublicKey(""),
+        new PublicKey('E8w73xa5jhjTfTpqduTi3uF2TjTsNT971sxFjhH3S5kX'),
+        // new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
+        walletPublicKey || new PublicKey("")
       );
       setBalance(
         poolDetail?.userAssets?.lendingReceiptAmount
           ? Number(poolDetail?.userAssets?.lendingReceiptAmount)
-          : 0,
+          : 0
       );
     } catch (error) {
       console.error("Error fetchDetails", error);
@@ -91,25 +92,27 @@ export const DepositTabs = () => {
     }
   }, [selectedToken.symbol, walletPublicKey]);
 
-  useEffect(() => {
-    const handleConnect = () => {
-      setConnected(true);
-    };
-    const handleDisconnect = () => {
-      setConnected(false);
-    };
+  // useEffect(() => {
+  //   const handleConnect = () => {
+  //     setConnected(true);
+  //   };
+  //   const handleDisconnect = () => {
+  //     setConnected(false);
+  //   };
 
-    window?.solana?.on("connect", handleConnect);
-    window?.solana?.on("disconnect", handleDisconnect);
+  //   window?.solana?.on("connect", handleConnect);
+  //   window?.solana?.on("disconnect", handleDisconnect);
 
-    return () => {
-      window?.solana?.off("connect", handleConnect);
-      window?.solana?.off("disconnect", handleDisconnect);
-    };
-  }, []);
+  //   return () => {
+  //     window?.solana?.off("connect", handleConnect);
+  //     window?.solana?.off("disconnect", handleDisconnect);
+  //   };
+  // }, []);
 
   return (
     <CardContainer>
+      <Toaster position="top-right" />
+
       <Tabs value={selectedTab} onValueChange={(val) => setSelectedTab(val)}>
         <TabsList className="w-auto mb-6 bg-green-dark p-2 rounded-2xl border-4 border-black text-black/60 text-[15px]">
           {tabs.map((tab) => (

@@ -11,6 +11,7 @@ import TokenData from "./TokenData";
 import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
 import { redeem } from "@/lib/borrow";
 import toast, { Toaster } from "react-hot-toast";
+import { BottomBtn } from "./BottomBtn";
 
 interface WithdrawCardProps {
   connected: boolean;
@@ -65,7 +66,7 @@ export default function WithdrawCard({
         // withdraw
         wallet,
         connection,
-        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
+        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6")
       );
       callback?.();
       toast.success("Withdraw successful!");
@@ -98,19 +99,13 @@ export default function WithdrawCard({
         />
       </div>
       <Separator.Root className="bg-green-dark w-full h-1" />
-      {connected ? (
-        <MemeButton
-          className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
-          onClick={handleWithdraw}
-          disabled={loading || withdrawAmount <= 0 || !selectedToken.symbol}
-        >
-          {loading ? "Processing..." : "Withdraw"}
-        </MemeButton>
-      ) : (
-        <div className="rounded-full mt-0 w-full bg-yellow-light hover:bg-yellow-dark font-bold">
-          <UnifiedWalletButton buttonClassName="!transform !hover:scale-105 !transition-all !border-4 !border-black !rounded-full !w-full !py-3 !px-6 !text-base !flex !items-center !justify-center !bg-yellow-light" />
-        </div>
-      )}
+      <BottomBtn
+        text="Withdraw"
+        loading={loading}
+        connected={connected}
+        handleClick={handleWithdraw}
+        disabled={loading || withdrawAmount === 0 || !selectedToken.symbol}
+      />
     </div>
   );
 }

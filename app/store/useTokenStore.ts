@@ -6,6 +6,7 @@ import {
   JITOSOL_MINT,
   JUPSOL_MINT,
   BNSOL_MINT,
+  USDC_MINT,
 } from "@/core/setting";
 
 export interface TokenInfo {

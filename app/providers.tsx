@@ -10,12 +10,13 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import dynamic from "next/dynamic";
 import Script from "next/script";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Spinner } from "./components/ui/Spinner";
+import useNetworkStore from "./store/useNetworkStore";
 
 const WalletContextProvider = dynamic(
   () => import("./components/ui/walletContextProvider"),
-  { ssr: false },
+  { ssr: false }
 );
 
 const SimpleSnackbar = dynamic(() => import("./components/ui/SimpleSnackbar"), {
@@ -27,6 +28,23 @@ const endpoint =
 const wallets = [new PhantomWalletAdapter(), new SolflareWalletAdapter()];
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const { setConnected } = useNetworkStore();
+  useEffect(() => {
+    const handleConnect = () => {
+      setConnected(true);
+    };
+    const handleDisconnect = () => {
+      setConnected(false);
+    };
+
+    window?.solana?.on("connect", handleConnect);
+    window?.solana?.on("disconnect", handleDisconnect);
+
+    return () => {
+      window?.solana?.off("connect", handleConnect);
+      window?.solana?.off("disconnect", handleDisconnect);
+    };
+  }, []);
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>

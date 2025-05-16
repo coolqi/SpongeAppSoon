@@ -34,7 +34,7 @@ export default function PercentageButtons({
           key={percentage.value}
           disabled={balance === 0 || disabled}
           onClick={() => handleSetPercentage(percentage.value)}
-          className="rounded-lg py-1 px-2 text-sm bg-gray-800 text-white hover:bg-gray-700 transition-colors disabled:bg-gray-400 disabled:text-gray-900"
+          className="leading-none rounded-xl py-1.5 px-3 text-sm bg-green-light shadow-inner-green text-black hover:bg-green-dark transition-colors disabled:hover:bg-green-light"
         >
           {percentage.label}
         </button>
