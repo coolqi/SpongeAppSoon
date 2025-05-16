@@ -187,8 +187,17 @@ export async function redeemCash(
   amount: number
 ) {
   try {
-    const provider = new anchor.AnchorProvider(connection, wallet, {
+    // Create a new connection with shorter timeout
+    const newConnection = new Connection(connection.rpcEndpoint, {
+      commitment: "confirmed",
+      confirmTransactionInitialTimeout: 10000, // 10 seconds
+    });
+
+    const provider = new anchor.AnchorProvider(newConnection, wallet, {
       preflightCommitment: "confirmed",
+      commitment: "confirmed",
+      skipPreflight: false,
+      maxRetries: 5,
     });
 
     const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
@@ -235,26 +244,59 @@ export async function redeemCash(
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods
-      .redeemCash()
-      .accounts({
-        cashPool: poolPda,
-        poolAuthority: poolAuthority,
-        poolAccountCash: poolAccountCash,
-        cashTokenMint: cashTokenMint,
-        sCashTokenMint: sCashTokenMint,
-        lender: provider.wallet.publicKey,
-        lenderCashToken: lenderCashToken,
-        lenderScashToken: lenderScashToken,
-        payer: provider.wallet.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    let txSignature: string;
+    try {
+      txSignature = await program.methods
+        .redeemCash()
+        .accounts({
+          cashPool: poolPda,
+          poolAuthority: poolAuthority,
+          poolAccountCash: poolAccountCash,
+          cashTokenMint: cashTokenMint,
+          sCashTokenMint: sCashTokenMint,
+          lender: provider.wallet.publicKey,
+          lenderCashToken: lenderCashToken,
+          lenderScashToken: lenderScashToken,
+          payer: provider.wallet.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    } catch (error: any) {
+      // Check if the error is about duplicate transaction
+      if (error.message?.includes("already been processed")) {
+        // If we have a valid signature in the error, use it
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          try {
+            const status = await provider.connection.getSignatureStatus(error.signature);
+            if (status?.value?.confirmationStatus === "confirmed") {
+              txSignature = error.signature;
+            } else {
+              throw error;
+            }
+          } catch (statusError) {
+            // If we can't get the status, just use the signature
+            txSignature = error.signature;
+          }
+        } else {
+          throw error;
+        }
+      }
+      // Ignore timeout errors
+      else if (error.message?.includes("Transaction was not confirmed")) {
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          txSignature = error.signature;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
 
     return {
-      tx,
+      tx: txSignature,
       accounts: {
         poolAuthority,
         cashTokenMint,

@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
+import { Connection, PublicKey, SystemProgram, TransactionConfirmationStrategy, RpcResponseAndContext, SignatureResult, Commitment } from "@solana/web3.js";
 import { Idl } from "@coral-xyz/anchor";
 import fallIdl from "./cash.json";
 import BN from "bn.js";
@@ -38,8 +38,17 @@ export const borrow = async (
   borrowAmount: number,
 ) => {
   try {
-    const provider = new anchor.AnchorProvider(connection, wallet, {
+    // Create a new connection with shorter timeout
+    const newConnection = new Connection(connection.rpcEndpoint, {
+      commitment: "confirmed",
+      confirmTransactionInitialTimeout: 10000, // 10 seconds
+    });
+
+    const provider = new anchor.AnchorProvider(newConnection, wallet, {
       preflightCommitment: "confirmed",
+      commitment: "confirmed",
+      skipPreflight: false,
+      maxRetries: 5,
     });
 
     const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
@@ -92,28 +101,61 @@ export const borrow = async (
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods
-      .lend(new BN(borrowAmount))
-      .accounts({
-        pool: poolPda,
-        poolAuthority: poolAuthority,
-        poolAccountA: poolAccountA,
-        lendingReceiptTokenMint: lendingReceiptTokenMint,
-        cashTokenMint: cashTokenMint,
-        lender: provider.wallet.publicKey,
-        lenderTokenA: lenderTokenA,
-        lenderAuthority: lenderAuthority,
-        lenderLendReceiptToken: lenderLendReceiptToken,
-        lenderCashToken: lenderCashToken,
-        payer: provider.wallet.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    let txSignature: string;
+    try {
+      txSignature = await program.methods
+        .lend(new BN(borrowAmount))
+        .accounts({
+          pool: poolPda,
+          poolAuthority: poolAuthority,
+          poolAccountA: poolAccountA,
+          lendingReceiptTokenMint: lendingReceiptTokenMint,
+          cashTokenMint: cashTokenMint,
+          lender: provider.wallet.publicKey,
+          lenderTokenA: lenderTokenA,
+          lenderAuthority: lenderAuthority,
+          lenderLendReceiptToken: lenderLendReceiptToken,
+          lenderCashToken: lenderCashToken,
+          payer: provider.wallet.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    } catch (error: any) {
+      // Check if the error is about duplicate transaction
+      if (error.message?.includes("already been processed")) {
+        // If we have a valid signature in the error, use it
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          try {
+            const status = await provider.connection.getSignatureStatus(error.signature);
+            if (status?.value?.confirmationStatus === "confirmed") {
+              txSignature = error.signature;
+            } else {
+              throw error;
+            }
+          } catch (statusError) {
+            // If we can't get the status, just use the signature
+            txSignature = error.signature;
+          }
+        } else {
+          throw error;
+        }
+      }
+      // Ignore timeout errors
+      else if (error.message?.includes("Transaction was not confirmed")) {
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          txSignature = error.signature;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
 
     return {
-      tx,
+      tx: txSignature,
       accounts: {
         poolAuthority,
         lendingReceiptTokenMint,
@@ -141,8 +183,17 @@ export async function redeem(
   poolPda: PublicKey,
 ) {
   try {
-    const provider = new anchor.AnchorProvider(connection, wallet, {
+    // Create a new connection with shorter timeout
+    const newConnection = new Connection(connection.rpcEndpoint, {
+      commitment: "confirmed",
+      confirmTransactionInitialTimeout: 10000, // 10 seconds
+    });
+
+    const provider = new anchor.AnchorProvider(newConnection, wallet, {
       preflightCommitment: "confirmed",
+      commitment: "confirmed",
+      skipPreflight: false,
+      maxRetries: 5,
     });
 
     const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
@@ -195,29 +246,62 @@ export async function redeem(
       owner: provider.wallet.publicKey,
     });
 
-    const tx = await program.methods
-      .redeem()
-      .accounts({
-        pool: poolPda,
-        poolAuthority: poolAuthority,
-        mintA: mintA,
-        poolAccountA: poolAccountA,
-        lendingReceiptTokenMint: lendingReceiptTokenMint,
-        lender: provider.wallet.publicKey,
-        lenderTokenA: lenderTokenA,
-        lenderAuthority: lenderAuthority,
-        lenderLendReceiptToken: lenderLendReceiptToken,
-        cashTokenMint: cashTokenMint,
-        lenderCashToken: lenderCashToken,
-        payer: provider.wallet.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    let txSignature: string;
+    try {
+      txSignature = await program.methods
+        .redeem()
+        .accounts({
+          pool: poolPda,
+          poolAuthority: poolAuthority,
+          mintA: mintA,
+          poolAccountA: poolAccountA,
+          lendingReceiptTokenMint: lendingReceiptTokenMint,
+          lender: provider.wallet.publicKey,
+          lenderTokenA: lenderTokenA,
+          lenderAuthority: lenderAuthority,
+          lenderLendReceiptToken: lenderLendReceiptToken,
+          cashTokenMint: cashTokenMint,
+          lenderCashToken: lenderCashToken,
+          payer: provider.wallet.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    } catch (error: any) {
+      // Check if the error is about duplicate transaction
+      if (error.message?.includes("already been processed")) {
+        // If we have a valid signature in the error, use it
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          try {
+            const status = await provider.connection.getSignatureStatus(error.signature);
+            if (status?.value?.confirmationStatus === "confirmed") {
+              txSignature = error.signature;
+            } else {
+              throw error;
+            }
+          } catch (statusError) {
+            // If we can't get the status, just use the signature
+            txSignature = error.signature;
+          }
+        } else {
+          throw error;
+        }
+      }
+      // Ignore timeout errors
+      else if (error.message?.includes("Transaction was not confirmed")) {
+        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
+          txSignature = error.signature;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
 
     return {
-      tx,
+      tx: txSignature,
       accounts: {
         poolAuthority,
         lendingReceiptTokenMint,
