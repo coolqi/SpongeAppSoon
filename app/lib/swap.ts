@@ -1,16 +1,14 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
 import {
-  TOKEN_PROGRAM_ID, 
+  TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
   getAccount,
 } from "./splToken";
 import { BN } from "bn.js";
 import fallIdl from "./utils/swap.json";
-import {
-  AUTHORITY_SEED,
-} from "./constants";
+import { AUTHORITY_SEED } from "./constants";
 import { Idl } from "@coral-xyz/anchor";
 import tokenList from "./utils/token.json";
 
@@ -97,30 +95,75 @@ export async function swap(
 
     const inputAmountBN = new BN(Math.floor(inputAmount));
     const minOutputAmountBN = new BN(Math.floor(minOutputAmount));
-    
-    const tx = await program.methods
-      .swapExactTokensForTokens(swapAtoB, inputAmountBN, minOutputAmountBN)
-      .accounts({
-        amm,
-        pool,
-        poolAuthority,
-        trader: wallet.publicKey,
-        mintA,
-        mintB,
-        poolAccountA,
-        poolAccountB,
-        traderAccountA,
-        traderAccountB,
-        payer: wallet.publicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    let txSignature: string;
 
-    return tx;
+    try {
+      txSignature = await program.methods
+        .swapExactTokensForTokens(swapAtoB, inputAmountBN, minOutputAmountBN)
+        .accounts({
+          amm,
+          pool,
+          poolAuthority,
+          trader: wallet.publicKey,
+          mintA,
+          mintB,
+          poolAccountA,
+          poolAccountB,
+          traderAccountA,
+          traderAccountB,
+          payer: wallet.publicKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .rpc();
+    } catch (error: any) {
+      // Check if the error is about duplicate transaction
+      if (error.message?.includes("already been processed")) {
+        // If we have a valid signature in the error, use it
+        if (
+          error.signature &&
+          typeof error.signature === "string" &&
+          error.signature.length > 0
+        ) {
+          try {
+            const status = await provider.connection.getSignatureStatus(
+              error.signature
+            );
+            if (status?.value?.confirmationStatus === "confirmed") {
+              txSignature = error.signature;
+            } else {
+              throw error;
+            }
+          } catch (statusError) {
+            // If we can't get the status, just use the signature
+            txSignature = error.signature;
+          }
+        } else {
+          if (!error.signature) {
+            return;
+          }
+          throw error;
+        }
+      }
+      // Ignore timeout errors
+      else if (error.message?.includes("Transaction was not confirmed")) {
+        if (
+          error.signature &&
+          typeof error.signature === "string" &&
+          error.signature.length > 0
+        ) {
+          txSignature = error.signature;
+        } else {
+          throw error;
+        }
+      } else {
+        throw error;
+      }
+    }
+
+    return txSignature;
   } catch (error) {
-    console.error("Error in swap:", error);
     throw error;
   }
 }

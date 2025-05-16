@@ -7,12 +7,11 @@ import BorrowCard from "./BorrowCard";
 import WithdrawCard from "./WithdrawCard";
 import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getSolBalance } from "@/lib/borrow";
 import { getPoolDetail } from "@/lib/stake";
 import useNetworkStore from "@/store/useNetworkStore";
 import toast, { Toaster } from "react-hot-toast";
-import { USDC_MINT } from "@/core/setting";
 
 const tabs = [
   {
@@ -52,7 +51,7 @@ export const DepositTabs = () => {
 
   const fetchDetails = async () => {
     try {
-      if (!wallet) {
+      if (!wallet || !walletPublicKey) {
         toast.error("Wallet not connected");
         return;
       }
@@ -60,8 +59,7 @@ export const DepositTabs = () => {
       const poolDetail = await getPoolDetail(
         wallet,
         connection,
-        new PublicKey('E8w73xa5jhjTfTpqduTi3uF2TjTsNT971sxFjhH3S5kX'),
-        // new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
+        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
         walletPublicKey || new PublicKey("")
       );
       setBalance(

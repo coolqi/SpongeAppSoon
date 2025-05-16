@@ -16,6 +16,7 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
 } from "./splToken";
+import { handleError } from "./utils/error";
 
 export interface PoolStatusInfo {
   createPool1: boolean;
@@ -31,44 +32,57 @@ export type PoolDetailInfo = {
     userSCashAmount: string;
   };
 };
-
 export async function getPoolDetail(
   wallet: AnchorWallet,
   connection: Connection,
   poolPk: PublicKey,
-  walletPublicKey: PublicKey
+  walletPublicKey: PublicKey  
 ): Promise<PoolDetailInfo> {
   try {
-    const provider = new anchor.AnchorProvider(connection, wallet, {
-      commitment: "confirmed",
-      preflightCommitment: "confirmed",
-    });
-    const program = new anchor.Program(fallIdl as any as Idl, provider) as any;
+    const provider = new anchor.AnchorProvider(
+      connection,
+      wallet,
+      {
+        commitment: "confirmed",
+        preflightCommitment: "confirmed" 
+      }
+    );
+    const program = new anchor.Program(
+      (fallIdl as any) as Idl,
+      provider
+    ) as any;
 
     const pool = await program.account.pool.fetch(poolPk);
     let amm: any;
-    try {
+    try{
       amm = await program.account.amm.fetch(pool.amm);
-    } catch (e) {
-      console.log("amm err", e);
+    }catch(e){
     }
 
     const mintA = new PublicKey(pool.mintA);
-
+    
     const [lenderAuthority] = PublicKey.findProgramAddressSync(
       [
         poolPk.toBuffer(),
         provider.wallet.publicKey.toBuffer(),
-        Buffer.from(AUTHORITY_SEED),
+        Buffer.from(AUTHORITY_SEED)
       ],
       program.programId
     );
     const [poolAuthority] = PublicKey.findProgramAddressSync(
-      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
+      [
+        pool.amm.toBuffer(),
+        mintA.toBuffer(),
+        Buffer.from(AUTHORITY_SEED)
+      ],
       program.programId
     );
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
-      [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
+      [
+        pool.amm.toBuffer(),
+        mintA.toBuffer(),
+        Buffer.from(LENDING_TOKEN_SEED)
+      ],
       program.programId
     );
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
@@ -78,7 +92,7 @@ export async function getPoolDetail(
     const [sCashTokenMint] = PublicKey.findProgramAddressSync(
       [
         pool.amm.toBuffer(),
-        pool.mintA.toBuffer(),
+        mintA.toBuffer(),
         Buffer.from(SCASH_TOKEN_SEED),
       ],
       program.programId
@@ -98,15 +112,16 @@ export async function getPoolDetail(
       getUserTokenAmount(connection, walletPublicKey, cashTokenMint).catch(
         () => 0
       ),
-      // getUserTokenAmount(connection, poolAuthority, cashTokenMint).catch(() => 0),
       getUserTokenAmount(connection, poolAuthority, pool.mintA).catch(() => 0),
       getUserTokenAmount(connection, walletPublicKey, mintA).catch(() => 0),
-      getUserTokenAmount(
-        connection,
-        lenderAuthority,
-        lendingReceiptTokenMint
-      ).catch(() => 0),
+      getUserTokenAmount(connection, lenderAuthority, lendingReceiptTokenMint).catch(() => 0),
     ]);
+    console.log("poolAccountAInfo", poolAccountAInfo);
+    console.log("userTokenAAccount", userTokenAAccount);
+    console.log("userLendingReceiptAmount", userLendingReceiptAmount);
+    console.log("cashTokenMint", cashTokenMint.toString());
+
+    console.log("userCashAmount", userCashAmount);
     return {
       poolStatus: {
         createPool1,
@@ -116,10 +131,7 @@ export async function getPoolDetail(
         amm: pool.amm,
         admin: amm.admin,
         mintA: mintA,
-        tokenASymbol:
-          mintA.toString() === "So11111111111111111111111111111111111111112"
-            ? "SOL"
-            : "USDT",
+        tokenASymbol: mintA.toString() === "So11111111111111111111111111111111111111112" ? "SOL" : "USDT",
         tokenAIcon: null as any,
         tokenAAmount: Number(poolAccountAInfo),
       },
@@ -128,10 +140,10 @@ export async function getPoolDetail(
         lendingReceiptAmount: userLendingReceiptAmount.toString(),
         cashAmount: userCashAmount.toString(),
         userSCashAmount: userSCashAmount.toString(),
-      },
+      }
     };
   } catch (error) {
-    console.error("Error getting lending pool details:", error);
+    console.error('Error getting lending pool details:', error);
     return {
       poolStatus: {
         createPool1: false,
@@ -144,11 +156,11 @@ export async function getPoolDetail(
         tokenAAmount: 0,
       },
       userAssets: {
-        tokenAAmount: "0",
-        lendingReceiptAmount: "0",
-        cashAmount: "0",
-        userSCashAmount: "0",
-      },
+        tokenAAmount: '0',
+        lendingReceiptAmount: '0',
+        cashAmount: '0',
+        userSCashAmount: '0'
+      }
     };
   }
 }
@@ -158,17 +170,20 @@ async function getUserTokenAmount(
   walletPublicKey: PublicKey,
   tokenMint: PublicKey
 ): Promise<number> {
+  let num = 0;
+  const userToken = getAssociatedTokenAddressSync(
+    tokenMint,
+    walletPublicKey,
+    true
+  );
   try {
-    const userToken = await getAssociatedTokenAddressSync(
-      tokenMint,
-      walletPublicKey,
-      true
-    );
     const userTokenAccount = await getAccount(connection as any, userToken);
-    return Number(userTokenAccount.amount);
+    num = Number(userTokenAccount.amount);
   } catch (e) {
     console.log("getUserTokenAmount err", e);
     return 0;
+  } finally {
+    return num;
   }
 }
 
@@ -264,35 +279,7 @@ export async function redeemCash(
         })
         .rpc();
     } catch (error: any) {
-      // Check if the error is about duplicate transaction
-      if (error.message?.includes("already been processed")) {
-        // If we have a valid signature in the error, use it
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          try {
-            const status = await provider.connection.getSignatureStatus(error.signature);
-            if (status?.value?.confirmationStatus === "confirmed") {
-              txSignature = error.signature;
-            } else {
-              throw error;
-            }
-          } catch (statusError) {
-            // If we can't get the status, just use the signature
-            txSignature = error.signature;
-          }
-        } else {
-          throw error;
-        }
-      }
-      // Ignore timeout errors
-      else if (error.message?.includes("Transaction was not confirmed")) {
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          txSignature = error.signature;
-        } else {
-          throw error;
-        }
-      } else {
-        throw error;
-      }
+      txSignature = await handleError(error, provider) ?? '';
     }
 
     return {
