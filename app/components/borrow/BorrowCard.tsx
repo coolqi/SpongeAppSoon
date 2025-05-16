@@ -98,7 +98,7 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
             Available colleteral:
           </span>
           <span className="font-bold ml-1">
-            {formatAmount(parseFloat(getMockQuote(balance).toFixed(4)))}
+            {formatAmount(parseFloat(getMockQuote(balance).toFixed(5)))}
           </span>
         </div>
       </div>

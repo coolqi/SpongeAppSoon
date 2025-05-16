@@ -7,6 +7,7 @@ import fallIdl from "./cash.json";
 import BN from "bn.js";
 import { Idl } from "@coral-xyz/anchor";
 import { AUTHORITY_SEED, CASH_TOKEN_SEED, SCASH_TOKEN_SEED } from "./constants";
+import { handleError } from "./utils/error";
 
 export async function lendCash(
   wallet: any,
@@ -57,8 +58,9 @@ export async function lendCash(
       mint: sCashTokenMint,
       owner: provider.wallet.publicKey,
     });
-
-    const tx = await program.methods
+    let tx = '';
+    try {
+      tx = await program.methods
       .lendCash(new BN(amount))
       .accounts({
         mintA: pool.mintA,
@@ -76,7 +78,9 @@ export async function lendCash(
         systemProgram: SystemProgram.programId,
       })
       .rpc();
-
+    } catch (error) {
+      tx = await handleError(error, provider) ?? '';
+    }
     return {
       tx,
       accounts: {

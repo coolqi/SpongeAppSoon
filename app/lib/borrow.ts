@@ -1,6 +1,14 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Connection, PublicKey, SystemProgram, TransactionConfirmationStrategy, RpcResponseAndContext, SignatureResult, Commitment } from "@solana/web3.js";
-import { Idl } from "@coral-xyz/anchor";
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  TransactionConfirmationStrategy,
+  RpcResponseAndContext,
+  SignatureResult,
+  Commitment,
+} from "@solana/web3.js";
+import { Idl, web3 } from "@coral-xyz/anchor";
 import fallIdl from "./cash.json";
 import BN from "bn.js";
 import {
@@ -8,11 +16,16 @@ import {
   LENDING_TOKEN_SEED,
   CASH_TOKEN_SEED,
 } from "./constants";
-import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from "./splToken";
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  TOKEN_PROGRAM_ID,
+} from "./splToken";
+import { handleError } from "./utils/error";
 
 export const getSolBalance = async (
   connection: Connection,
-  walletPublicKey: PublicKey,
+  walletPublicKey: PublicKey
 ) => {
   if (!walletPublicKey) return 0;
 
@@ -35,7 +48,7 @@ export const borrow = async (
   wallet: any,
   connection: Connection,
   poolPda: PublicKey,
-  borrowAmount: number,
+  borrowAmount: number
 ) => {
   try {
     // Create a new connection with shorter timeout
@@ -58,23 +71,23 @@ export const borrow = async (
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
-      program.programId,
+      program.programId
     );
 
     const poolAccountA = getAssociatedTokenAddressSync(
       mintA,
       poolAuthority,
-      true,
+      true
     );
 
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
-      program.programId,
+      program.programId
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(CASH_TOKEN_SEED)],
-      program.programId,
+      program.programId
     );
 
     const lenderTokenA = await anchor.utils.token.associatedAddress({
@@ -88,7 +101,7 @@ export const borrow = async (
         provider.wallet.publicKey.toBuffer(),
         Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId,
+      program.programId
     );
 
     const lenderLendReceiptToken = await anchor.utils.token.associatedAddress({
@@ -123,35 +136,7 @@ export const borrow = async (
         })
         .rpc();
     } catch (error: any) {
-      // Check if the error is about duplicate transaction
-      if (error.message?.includes("already been processed")) {
-        // If we have a valid signature in the error, use it
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          try {
-            const status = await provider.connection.getSignatureStatus(error.signature);
-            if (status?.value?.confirmationStatus === "confirmed") {
-              txSignature = error.signature;
-            } else {
-              throw error;
-            }
-          } catch (statusError) {
-            // If we can't get the status, just use the signature
-            txSignature = error.signature;
-          }
-        } else {
-          throw error;
-        }
-      }
-      // Ignore timeout errors
-      else if (error.message?.includes("Transaction was not confirmed")) {
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          txSignature = error.signature;
-        } else {
-          throw error;
-        }
-      } else {
-        throw error;
-      }
+      txSignature = await handleError(error, provider) ?? '';
     }
 
     return {
@@ -173,14 +158,14 @@ export const borrow = async (
         stack: error.stack,
       });
     }
-    throw error;
+    // throw error;
   }
 };
 
 export async function redeem(
   wallet: any,
   connection: Connection,
-  poolPda: PublicKey,
+  poolPda: PublicKey
 ) {
   try {
     // Create a new connection with shorter timeout
@@ -203,23 +188,23 @@ export async function redeem(
 
     const [poolAuthority] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(AUTHORITY_SEED)],
-      program.programId,
+      program.programId
     );
 
     const poolAccountA = getAssociatedTokenAddressSync(
       mintA,
       poolAuthority,
-      true,
+      true
     );
 
     const [lendingReceiptTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(LENDING_TOKEN_SEED)],
-      program.programId,
+      program.programId
     );
 
     const [cashTokenMint] = PublicKey.findProgramAddressSync(
       [pool.amm.toBuffer(), mintA.toBuffer(), Buffer.from(CASH_TOKEN_SEED)],
-      program.programId,
+      program.programId
     );
 
     const lenderTokenA = await anchor.utils.token.associatedAddress({
@@ -233,7 +218,7 @@ export async function redeem(
         provider.wallet.publicKey.toBuffer(),
         Buffer.from(AUTHORITY_SEED),
       ],
-      program.programId,
+      program.programId
     );
 
     const lenderLendReceiptToken = await anchor.utils.token.associatedAddress({
@@ -269,35 +254,7 @@ export async function redeem(
         })
         .rpc();
     } catch (error: any) {
-      // Check if the error is about duplicate transaction
-      if (error.message?.includes("already been processed")) {
-        // If we have a valid signature in the error, use it
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          try {
-            const status = await provider.connection.getSignatureStatus(error.signature);
-            if (status?.value?.confirmationStatus === "confirmed") {
-              txSignature = error.signature;
-            } else {
-              throw error;
-            }
-          } catch (statusError) {
-            // If we can't get the status, just use the signature
-            txSignature = error.signature;
-          }
-        } else {
-          throw error;
-        }
-      }
-      // Ignore timeout errors
-      else if (error.message?.includes("Transaction was not confirmed")) {
-        if (error.signature && typeof error.signature === 'string' && error.signature.length > 0) {
-          txSignature = error.signature;
-        } else {
-          throw error;
-        }
-      } else {
-        throw error;
-      }
+      txSignature = await handleError(error, provider) ?? '';
     }
 
     return {

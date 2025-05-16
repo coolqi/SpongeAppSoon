@@ -60,7 +60,7 @@ export default function TokenData({
               <Spinner className="h-4 w-4" />
             ) : (
               <span className="font-medium ml-1 text-xs">
-                {parseFloat(balance?.toFixed(4))}
+                {parseFloat(balance?.toFixed(5))}
               </span>
             )}
             <span className="ml-1 text-xs">

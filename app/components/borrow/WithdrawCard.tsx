@@ -1,6 +1,5 @@
 "use client";
 
-import { MemeButton } from "../ui/MemeButton";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
 import { useState, useEffect, useMemo } from "react";
@@ -8,7 +7,6 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
-import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
 import { redeem } from "@/lib/borrow";
 import toast, { Toaster } from "react-hot-toast";
 import { BottomBtn } from "./BottomBtn";
