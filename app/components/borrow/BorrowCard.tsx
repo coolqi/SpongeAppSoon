@@ -1,6 +1,5 @@
 "use client";
 
-import { MemeButton } from "../ui/MemeButton";
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { Separator } from "radix-ui";
 import { useState, useMemo } from "react";
@@ -8,10 +7,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
-import { UnifiedWalletButton } from "@jup-ag/wallet-adapter";
-import { borrow, getInputBalance, getMockQuote } from "@/lib/borrow";
+import { borrow, getMockQuote } from "@/lib/borrow";
 import toast, { Toaster } from "react-hot-toast";
 import { formatAmount } from "@/lib/amount";
+import { BottomBtn } from "./BottomBtn";
 
 interface BorrowCardProps {
   connected: boolean;
@@ -104,19 +103,13 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
         </div>
       </div>
       <Separator.Root className="bg-green-dark w-full h-1" />
-      {connected ? (
-        <MemeButton
-          className="mt-0 w-full bg-yellow-light hover:bg-yellow-dark border-black"
-          onClick={handleBorrow}
-          disabled={loading || borrowAmount <= 0}
-        >
-          {loading ? "Processing..." : "Borrow"}
-        </MemeButton>
-      ) : (
-        <div className="rounded-full mt-0 w-full bg-yellow-light hover:bg-yellow-dark font-bold">
-          <UnifiedWalletButton buttonClassName="!transform !hover:scale-105 !transition-all !border-4 !border-black !rounded-full !w-full !py-3 !px-6 !text-base !flex !items-center !justify-center !bg-yellow-light" />
-        </div>
-      )}
+      <BottomBtn
+        text="Borrow"
+        loading={loading}
+        connected={connected}
+        handleClick={handleBorrow}
+        disabled={loading || borrowAmount === 0}
+      />
     </div>
   );
 }

@@ -14,6 +14,8 @@ export interface Network {
 
 interface NetworkState {
   networks: Network[];
+  connected: boolean;
+  setConnected: (val: boolean) => void;
   currentNetwork: {
     name: string;
     rpcUrl: string;
@@ -39,6 +41,12 @@ const NETWORKS: Network[] = [
 
 const useNetworkStore = create<NetworkState>((set) => ({
   networks: NETWORKS,
+  connected: false,
+  setConnected: (connected) => {
+    set(() => ({
+      connected
+    }))
+  },
   currentNetwork: {
     name: NETWORKS[0].name,
     rpcUrl: NETWORKS[0].rpcUrl,

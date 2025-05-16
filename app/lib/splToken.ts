@@ -2,6 +2,17 @@ import { struct, u32, u8, blob } from '@solana/buffer-layout';
 import { Commitment, Connection, PublicKey } from "@solana/web3.js";
 import { u64 as u64Layout } from '@solana/buffer-layout-utils';
 
+/** Base class for errors */
+export abstract class TokenError extends Error {
+    constructor(message?: string) {
+        super(message);
+    }
+}
+/** Thrown if the mint of a token account doesn't match the expected mint */
+export class TokenInvalidMintError extends TokenError {
+    name = 'TokenInvalidMintError';
+}
+
 export const bool = (property: any) => {
     const layout = u8(property);
     const { encode, decode } = encodeDecode(layout);
@@ -44,12 +55,7 @@ export const NATIVE_MINT = new PublicKey('So111111111111111111111111111111111111
 
 export const TOKEN_PROGRAM_ID = new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA');
 export const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL');
-/** Base class for errors */
-export class TokenError extends Error {
-    constructor(message: any) {
-        super(message);
-    }
-}
+
 export enum AccountType {
     Uninitialized = 0,
     Mint = 1,
@@ -219,4 +225,105 @@ export async function getAccount(
 ): Promise<{ amount: number }> {
     const info = await connection.getAccountInfo(address, commitment);
     return unpackAccount(address, info, programId) as any;
+}
+
+/** Information about a mint */
+export interface Mint {
+    /** Address of the mint */
+    address: PublicKey;
+    /**
+     * Optional authority used to mint new tokens. The mint authority may only be provided during mint creation.
+     * If no mint authority is present then the mint has a fixed supply and no further tokens may be minted.
+     */
+    mintAuthority: PublicKey | null;
+    /** Total supply of tokens */
+    supply: bigint;
+    /** Number of base 10 digits to the right of the decimal place */
+    decimals: number;
+    /** Is this mint initialized */
+    isInitialized: boolean;
+    /** Optional authority to freeze token accounts */
+    freezeAuthority: PublicKey | null;
+    /** Additional data for extension */
+    tlvData: Buffer;
+}
+
+/**
+ * Retrieve information about a mint
+ *
+ * @param connection Connection to use
+ * @param address    Mint account
+ * @param commitment Desired level of commitment for querying the state
+ * @param programId  SPL Token program account
+ *
+ * @return Mint information
+ */
+
+export async function getMint(
+    connection: Connection,
+    address: PublicKey,
+    commitment?: Commitment,
+    programId = TOKEN_PROGRAM_ID,
+): Promise<Mint> {
+    const info = await connection.getAccountInfo(address, commitment);
+    return unpackMint(address, info, programId);
+}
+
+/** Mint as stored by the program */
+export interface RawMint {
+    mintAuthorityOption: 1 | 0;
+    mintAuthority: PublicKey;
+    supply: bigint;
+    decimals: number;
+    isInitialized: boolean;
+    freezeAuthorityOption: 1 | 0;
+    freezeAuthority: PublicKey;
+}
+
+/** Buffer layout for de/serializing a mint */
+export const MintLayout = struct<RawMint>([
+    u32('mintAuthorityOption'),
+    publicKey('mintAuthority'),
+    u64Layout('supply'),
+    u8('decimals'),
+    bool('isInitialized'),
+    u32('freezeAuthorityOption'),
+    publicKey('freezeAuthority'),
+]);
+
+/**
+ * Unpack a mint
+ *
+ * @param address   Mint account
+ * @param info      Mint account data
+ * @param programId SPL Token program account
+ *
+ * @return Unpacked mint
+ */
+
+/** Byte length of a mint */
+export const MINT_SIZE = MintLayout.span;
+export function unpackMint(address: PublicKey, info: any, programId = TOKEN_PROGRAM_ID): Mint {
+    if (!info) throw new TokenAccountNotFoundError();
+    if (!info.owner.equals(programId)) throw new TokenInvalidAccountOwnerError();
+    if (info.data.length < MINT_SIZE) throw new TokenInvalidAccountSizeError();
+
+    const rawMint = MintLayout.decode(info.data.slice(0, MINT_SIZE));
+    let tlvData = Buffer.alloc(0);
+    if (info.data.length > MINT_SIZE) {
+        if (info.data.length <= ACCOUNT_SIZE) throw new TokenInvalidAccountSizeError();
+        if (info.data.length === MULTISIG_SIZE) throw new TokenInvalidAccountSizeError();
+        if (info.data[ACCOUNT_SIZE] != AccountType.Mint) throw new TokenInvalidMintError();
+        tlvData = info.data.slice(ACCOUNT_SIZE + ACCOUNT_TYPE_SIZE);
+    }
+
+    return {
+        address,
+        mintAuthority: rawMint.mintAuthorityOption ? rawMint.mintAuthority : null,
+        supply: rawMint.supply,
+        decimals: rawMint.decimals,
+        isInitialized: rawMint.isInitialized,
+        freezeAuthority: rawMint.freezeAuthorityOption ? rawMint.freezeAuthority : null,
+        tlvData,
+    };
 }
