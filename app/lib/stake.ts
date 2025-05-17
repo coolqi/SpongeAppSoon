@@ -116,12 +116,6 @@ export async function getPoolDetail(
       getUserTokenAmount(connection, walletPublicKey, mintA).catch(() => 0),
       getUserTokenAmount(connection, lenderAuthority, lendingReceiptTokenMint).catch(() => 0),
     ]);
-    console.log("poolAccountAInfo", poolAccountAInfo);
-    console.log("userTokenAAccount", userTokenAAccount);
-    console.log("userLendingReceiptAmount", userLendingReceiptAmount);
-    console.log("cashTokenMint", cashTokenMint.toString());
-
-    console.log("userCashAmount", userCashAmount);
     return {
       poolStatus: {
         createPool1,
@@ -165,7 +159,7 @@ export async function getPoolDetail(
   }
 }
 
-async function getUserTokenAmount(
+export async function getUserTokenAmount(
   connection: Connection,
   walletPublicKey: PublicKey,
   tokenMint: PublicKey
