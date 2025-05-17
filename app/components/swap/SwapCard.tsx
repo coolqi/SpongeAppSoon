@@ -150,11 +150,12 @@ export default function SwapCard({ callback }: SwapCardProps) {
         <div className="bg-green-dark border-4 border-black px-3 py-2 rounded-3xl">
           <TokenData
             isSwap
+            hideBalance
             topText="Buying"
             symbol={tokenSymbol}
             amount={buyAmount}
             setAmount={setBuyAmount}
-            balance={buyAmount || 0}
+            balance={(buyAmount || 0) / Math.pow(10, 6)}
             maxAmount={maxAAmount}
             loading={loading || isLoading}
             selectedToken={selectedBuyToken}

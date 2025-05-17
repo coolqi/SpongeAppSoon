@@ -12,6 +12,7 @@ interface TokenDataProps {
   topText?: string;
   symbol: string;
   amount: number;
+  hideBalance?: boolean;
   setAmount: (amount: number) => void;
   balance: number;
   loading: boolean;
@@ -30,6 +31,7 @@ export default function TokenData({
   balance,
   loading,
   maxAmount,
+  hideBalance,
   selectedToken,
   setSelectedToken,
   supportedTokens,
@@ -42,7 +44,7 @@ export default function TokenData({
       case "USDC":
         return "./usdc.png";
       case "USDT":
-        return "./usd.png";
+        return "./usdt.svg";
       case "mvmUSD":
         return "/cash.png";
       default:
@@ -55,7 +57,7 @@ export default function TokenData({
       {selectedToken.symbol ? (
         <section className="flex items-center justify-between">
           <div className="text-xs font-medium">{topText}</div>
-          <div className="flex items-center gap-1/2">
+          {hideBalance ? null : <div className="flex items-center gap-1/2">
             {loading ? (
               <Spinner className="h-4 w-4" />
             ) : (
@@ -66,7 +68,7 @@ export default function TokenData({
             <span className="ml-1 text-xs">
               {isSwap ? selectedToken.symbol : ""}
             </span>
-          </div>
+          </div>}
         </section>
       ) : null}
       <section className="flex items-center justify-between gap-2">
