@@ -158,7 +158,7 @@ export const borrow = async (
         stack: error.stack,
       });
     }
-    // throw error;
+    throw error;
   }
 };
 
