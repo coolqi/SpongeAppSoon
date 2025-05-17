@@ -108,10 +108,9 @@ export default function TokenData({
                 <Spinner className="h-4 w-4" />
               ) : (
                 <span className="font-bold ml-1">
-                  {formatAmount(parseFloat(balance.toFixed(5)))}
+                  {formatAmount(parseFloat((balance).toFixed(5)))}
                 </span>
               )}
-              <span className="ml-1">{selectedToken.symbol}</span>
             </div>
             <PercentageButtons
               balance={balance}

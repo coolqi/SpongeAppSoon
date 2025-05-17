@@ -21,7 +21,7 @@ export const handleError = async (error: any, provider: any) => {
             txSignature = error.signature;
           }
         } else {
-          if (!error.signature) {
+          if (error.signature === '') {
             return;
           }
           throw error;

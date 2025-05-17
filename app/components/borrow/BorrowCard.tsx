@@ -7,9 +7,8 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useNetworkStore from "@/store/useNetworkStore";
 import useTokenStore from "@/store/useTokenStore";
 import TokenData from "./TokenData";
-import { borrow, getMockQuote } from "@/lib/borrow";
+import { borrow } from "@/lib/borrow";
 import toast, { Toaster } from "react-hot-toast";
-import { formatAmount } from "@/lib/amount";
 import { BottomBtn } from "./BottomBtn";
 
 interface BorrowCardProps {
@@ -91,16 +90,6 @@ export default function BorrowCard({ connected, callback }: BorrowCardProps) {
           setSelectedToken={setSelectedToken}
           supportedTokens={supportedTokens}
         />
-      </div>
-      <div className="-mt-1 space-y-3">
-        <div className="flex justify-between items-center">
-          <span className="text-gray-600 dark:text-gray-400">
-            Available colleteral:
-          </span>
-          <span className="font-bold ml-1">
-            {formatAmount(parseFloat(getMockQuote(balance).toFixed(5)))}
-          </span>
-        </div>
       </div>
       <Separator.Root className="bg-green-dark w-full h-1" />
       <BottomBtn

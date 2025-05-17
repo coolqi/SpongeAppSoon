@@ -93,7 +93,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           sideOffset={sideOffset}
           collisionPadding={10}
           className={cn(
-            "z-[500] max-h-[--radix-select-content-available-height] w-[--radix-select-trigger-width] min-w-[140px] overflow-y-auto rounded-md bg-green-light border-green-lighter border-2",
+            "z-[500] max-h-[--radix-select-content-available-height] w-[--radix-select-trigger-width] min-w-[140px] overflow-y-auto rounded-md bg-green-light border-green-lighter border-2 shadow-lg",
             dropdownClassName,
           )}
         >
