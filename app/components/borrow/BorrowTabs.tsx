@@ -9,9 +9,10 @@ import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
 import useTokenStore from "@/store/useTokenStore";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getSolBalance } from "@/lib/borrow";
-import { getPoolDetail } from "@/lib/stake";
+import { getPoolDetail, getUserTokenAmount } from "@/lib/stake";
 import useNetworkStore from "@/store/useNetworkStore";
 import toast, { Toaster } from "react-hot-toast";
+import { ETH_MINT } from "@/core/setting";
 
 const tabs = [
   {
@@ -40,7 +41,13 @@ export const DepositTabs = () => {
     if (!walletPublicKey) return;
     setIsLoading(true);
     try {
-      const sol = await getSolBalance(connection, walletPublicKey);
+      const wsol = await getUserTokenAmount(
+        connection,
+        walletPublicKey,
+        ETH_MINT
+      );
+      // const sol = await getSolBalance(connection, walletPublicKey);
+      const sol = parseFloat((wsol / LAMPORTS_PER_SOL).toFixed(5));
       setBalance(sol);
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -59,7 +66,7 @@ export const DepositTabs = () => {
       const poolDetail = await getPoolDetail(
         wallet,
         connection,
-        new PublicKey('fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6'),
+        new PublicKey("fv1mcUWtZX3GVNvK55P3w36nd6r1wsQkPsb3TS2QTT6"),
         walletPublicKey || new PublicKey("")
       );
       setBalance(
@@ -89,23 +96,6 @@ export const DepositTabs = () => {
       setBalance(0);
     }
   }, [selectedToken.symbol, walletPublicKey]);
-
-  // useEffect(() => {
-  //   const handleConnect = () => {
-  //     setConnected(true);
-  //   };
-  //   const handleDisconnect = () => {
-  //     setConnected(false);
-  //   };
-
-  //   window?.solana?.on("connect", handleConnect);
-  //   window?.solana?.on("disconnect", handleDisconnect);
-
-  //   return () => {
-  //     window?.solana?.off("connect", handleConnect);
-  //     window?.solana?.off("disconnect", handleDisconnect);
-  //   };
-  // }, []);
 
   return (
     <CardContainer>
