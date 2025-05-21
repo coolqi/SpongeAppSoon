@@ -9,9 +9,9 @@ export default function Navbar() {
 
   const navItems = [
     // { icon: "🔄", label: "Swap", href: "/swap" },
-    // { icon: "🌉", label: "Bridge", href: "/bridge" },
     // { icon: "🔄", label: "Swap", href: "https://cobaltx.io/swap/" },
     { icon: "🔄", label: "Swap", href: "/swap" },
+    { icon: "🌉", label: "Bridge", href: "https://bridge.soo.network/home" },
     { icon: "", label: "Borrow", href: "/" },
     { icon: "🏦", label: "Stake", href: "/stake", disabled: false },
     // { icon: "📊", label: "Portfolio", href: "/portfolio" },

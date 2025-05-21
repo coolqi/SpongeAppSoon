@@ -1,11 +1,6 @@
 import { create } from "zustand";
 import { PublicKey } from "@solana/web3.js";
-import {
-  CASH_MINT,
-  SOL_MINT,
-  USDC_MINT,
-  USDT_MINT,
-} from "@/core/setting";
+import { CASH_MINT, SOL_MINT, USDC_MINT, USDT_MINT } from "@/core/setting";
 import { PoolInfo } from "@/lib/getPoolList";
 
 export interface TokenInfo {
@@ -46,20 +41,44 @@ interface TokenState {
   setSwapAmount: (amount: number) => void;
   setBuyAmount: (amount: number) => void;
   getTokenMint: (symbol: string) => PublicKey;
-  setMaxAAmount: (maxAAmount: number) => void,
+  setMaxAAmount: (maxAAmount: number) => void;
   // getBuyTokenMin: (symbol: string) => PublicKey;
 }
 
 // Define initial supported tokens
 const initialSupportedTokens: TokenInfo[] = [
+  // {
+  //   symbol: "USDC",
+  //   mint: USDC_MINT.toBase58(),
+  //   decimals: 6,
+  //   isNative: false,
+  // },
+  //   {
+  //   symbol: "USDT",
+  //   mint: USDT_MINT.toBase58(),
+  //   decimals: 6,
+  //   isNative: false,
+  // },
   {
-    symbol: "USDC",
+    symbol: "lvlUSD",
     mint: USDC_MINT.toBase58(),
     decimals: 6,
     isNative: false,
   },
-    {
-    symbol: "USDT",
+  {
+    symbol: "mUSD",
+    mint: USDT_MINT.toBase58(),
+    decimals: 6,
+    isNative: false,
+  },
+  {
+    symbol: "USD0",
+    mint: USDT_MINT.toBase58(),
+    decimals: 6,
+    isNative: false,
+  },
+  {
+    symbol: "USDe",
     mint: USDT_MINT.toBase58(),
     decimals: 6,
     isNative: false,
@@ -93,7 +112,7 @@ const useSwapStore = create<TokenState>((set, get) => ({
   setPools: (pools) => set({ pools }),
   setSelectedPool: (selectedPool) => set({ selectedPool }),
   setSelectedPoolDetails: (selectedPoolDetails) => set({ selectedPoolDetails }),
-  
+
   setIsLoading: (isLoading) => set({ isLoading }),
   setSelectedBuyToken: (token) => set({ selectedBuyToken: token }),
   setSelectedToken: (token) => set({ selectedToken: token }),
@@ -107,13 +126,13 @@ const useSwapStore = create<TokenState>((set, get) => ({
         return SOL_MINT;
       case "USDC":
         return USDC_MINT;
-      case 'USDT':
+      case "USDT":
         return USDT_MINT;
-      case 'mvmUSD':
+      case "mvmUSD":
         return CASH_MINT;
       default:
         const tokenInfo = get().supportedTokens.find(
-          (t) => t.symbol === symbol,
+          (t) => t.symbol === symbol
         );
         return tokenInfo ? new PublicKey(tokenInfo.mint) : SOL_MINT;
     }
